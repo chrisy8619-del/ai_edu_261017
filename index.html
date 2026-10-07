@@ -210,6 +210,9 @@ html,body{height:100%;background:#000;color:var(--fg);font-family:var(--sans);ov
 .golink{flex:none;display:inline-flex;align-items:center;gap:12px;font-size:26px;font-weight:700;letter-spacing:-.01em;color:#0a0a0a;background:var(--lime);padding:20px 32px;border-radius:999px;text-decoration:none;box-shadow:0 12px 40px rgba(200,255,62,.25);transition:transform .2s,box-shadow .2s}
 .golink:hover{transform:translateY(-3px);box-shadow:0 18px 50px rgba(200,255,62,.4)}
 .golink span{font-family:var(--mono)}
+.pmode{margin-left:18px;padding:4px 14px;border-radius:999px;font-size:17px;letter-spacing:.04em;text-transform:none}
+.pmode.on{color:var(--lime);border:1px solid rgba(200,255,62,.4)}
+.pmode.off{color:#0a0a0a;background:#ff8a6b;font-weight:700}
 /* live poll (horizontal ranking) */
 .prow.correct .pbar{background:var(--lime)!important;box-shadow:0 0 34px rgba(200,255,62,.55)}
 .prow.correct .plabel{color:var(--lime)}
@@ -760,15 +763,15 @@ html,body{height:100%;background:#000;color:var(--fg);font-family:var(--sans);ov
   <div class="s mute r mt-l">Thank you.</div>
 </section>
 
-<div class="foot"><span><b>AI × 현업</b> — 바이브코딩 워크숍</span><span id="pageNo">01 / 33</span></div>
+<div class="foot"><span><b>AI × 현업</b> — 바이브코딩 워크숍 <span class="pmode" id="pmode" hidden></span></span><span id="pageNo">01 / 33</span></div>
 <div class="navhint" id="hint">← → 이동 · F 전체화면</div>
 </div>
 
 <script>
 /* presenter key (cloud): open the deck once with ?key=XXXX; stored for this browser tab */
 (function(){
-  let k='';try{const u=new URL(location.href);k=u.searchParams.get('key')||sessionStorage.getItem('kn-key')||'';
-    if(u.searchParams.get('key')){sessionStorage.setItem('kn-key',k);u.searchParams.delete('key');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}
+  let k='';try{const u=new URL(location.href);k=u.searchParams.get('key')||localStorage.getItem('kn-key')||sessionStorage.getItem('kn-key')||'';
+    if(u.searchParams.get('key')){localStorage.setItem('kn-key',k);u.searchParams.delete('key');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}
   window.__KEY=k;const f=window.fetch.bind(window);
   window.fetch=(url,opt)=>{opt=opt||{};if(k&&typeof url==='string'&&url.startsWith('/api/')){opt.headers=Object.assign({},opt.headers||{},{'X-Admin-Key':k})}return f(url,opt)};
 })();
@@ -1101,6 +1104,15 @@ function makePoll(sec,pref,apiId,isQuiz){
 window.POLL=makePoll(document.getElementById('pollSlide'),'poll','poll',false);
 window.QUIZ=makePoll(document.getElementById('quizSlide'),'quiz','quiz',true);
 
+/* ===== presenter mode badge (cloud) ===== */
+(async function(){
+  if(!location.protocol.startsWith('http'))return;
+  try{const i=await (await fetch('/api/info',{cache:'no-store'})).json();if(!i.cloud)return;
+    const b=document.getElementById('pmode');b.hidden=false;
+    if(i.admin){b.className='pmode on';b.textContent='● 발표자 모드'}
+    else{b.className='pmode off';b.textContent=window.__KEY?'발표자 키가 틀립니다 — 휴대폰이 따라오지 않습니다':'보기 전용 — 휴대폰이 따라오지 않습니다 (주소 뒤에 ?key= 필요)'}
+  }catch(e){}
+})();
 /* ===== Venue Wi-Fi check (asked on every launch; nothing is stored) ===== */
 window.WIFI_SEL=null;
 window.WIFI_SETUP=(function(){
