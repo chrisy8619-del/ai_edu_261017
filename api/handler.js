@@ -1,7 +1,16 @@
 // Live backend for the keynote (word cloud, poll, quiz, slide follow).
 // Storage: Upstash Redis REST (env set automatically when Upstash is connected in Vercel).
-const R_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
-const R_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
+// Find the Upstash REST credentials whatever prefix Vercel gave them (KV_, STORAGE_, UPSTASH_REDIS_ ...)
+function findEnv(suffixes) {
+  for (const sfx of suffixes) {
+    for (const k of Object.keys(process.env)) {
+      if (k.endsWith(sfx) && !/READ_ONLY/.test(k) && process.env[k]) return process.env[k];
+    }
+  }
+  return '';
+}
+const R_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || findEnv(['_REST_API_URL', '_REDIS_REST_URL']);
+const R_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || findEnv(['_REST_API_TOKEN', '_REDIS_REST_TOKEN']);
 const ADMIN = process.env.ADMIN_KEY || '';
 const crypto = require('crypto');
 let KEY_HASH = ''; try { KEY_HASH = require('./_key.js'); } catch (e) { }   // written by deploy.ps1 (sha256 of presenter key)
