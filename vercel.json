@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/live", "destination": "/live.html" },
+    { "source": "/api/:path*", "destination": "/api/handler?p=:path*" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
+  ]
+}

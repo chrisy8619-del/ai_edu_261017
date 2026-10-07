@@ -1,0 +1,13 @@
+AI x 현업 장표 - Vercel 배포 방법
+
+1. 이 폴더(압축 푼 폴더)에서 deploy.bat 을 더블클릭합니다.
+2. 처음 한 번만 Vercel 로그인 창이 브라우저로 열립니다. 로그인하세요.
+3. 처음 한 번만 "실시간 저장소 연결" 안내가 나옵니다.
+   열리는 Vercel 화면에서 Storage > Create Database > Upstash (Redis) > 무료 플랜 >
+   프로젝트 ai-vibecoding-keynote 에 Connect 한 뒤, 검은 창에서 Enter 를 누릅니다.
+4. 1~2분 뒤 배포가 끝나면 발표자 주소가 브라우저로 열리고 presenter-url.txt 에 저장됩니다.
+
+- 발표자 주소(?key= 가 붙은 주소)로 열어야 장표 넘김·초기화·정답 공개가 수강생 휴대폰에 반영됩니다.
+  이 주소와 presenter-key.txt 는 외부에 공유하지 마세요.
+- 공유용 주소는 장표만 볼 수 있고 조작은 안 됩니다.
+- 장표를 고친 뒤 다시 올리려면 index.html 을 바꾸고 deploy.bat 을 다시 실행하면 됩니다.

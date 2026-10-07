@@ -1,0 +1,1137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI × 현업 — 바이브코딩 워크숍</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07070a; --fg:#f4f4f6; --mute:#8b8b96; --dim:#4a4a55;
+  --line:rgba(255,255,255,.09); --card:rgba(255,255,255,.035);
+  --lime:#c8ff3e; --violet:#7c5cff; --coral:#ff5a36; --sky:#3ec8ff;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;color:var(--fg);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased;word-break:keep-all}
+.stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center;background:var(--bg);overflow:hidden}
+/* grain */
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;z-index:50;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.slide{position:absolute;inset:0;padding:130px 150px 140px;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility .6s;display:flex;flex-direction:column}
+.slide.active{opacity:1;visibility:visible}
+.center{justify-content:center}
+.glow{position:absolute;border-radius:50%;filter:blur(140px);opacity:.55;pointer-events:none;z-index:0}
+.slide > *:not(.glow){position:relative;z-index:1}
+.r{opacity:0;transform:translateY(34px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.slide.active .r{opacity:1;transform:none}
+
+/* chrome */
+.progress{position:absolute;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--violet),var(--lime));z-index:60;transition:width .5s ease}
+.foot{position:absolute;bottom:52px;left:150px;right:150px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:20px;color:var(--dim);letter-spacing:.08em;z-index:60;text-transform:uppercase}
+.foot b{color:var(--mute);font-weight:600}
+
+/* type */
+.kicker{font-family:var(--mono);font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);display:flex;align-items:center;gap:16px;margin-bottom:44px}
+.kicker::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--lime);box-shadow:0 0 20px var(--lime)}
+.xxl{font-size:220px;font-weight:800;letter-spacing:-.055em;line-height:.95}
+.xl{font-size:150px;font-weight:800;letter-spacing:-.05em;line-height:1.02}
+.l{font-size:104px;font-weight:780;letter-spacing:-.045em;line-height:1.08}
+.m{font-size:72px;font-weight:750;letter-spacing:-.04em;line-height:1.15}
+.s{font-size:46px;font-weight:650;letter-spacing:-.03em;line-height:1.3}
+.body{font-size:36px;line-height:1.55;color:var(--mute);font-weight:450;letter-spacing:-.015em}
+.mute{color:var(--mute)} .dim{color:var(--dim)}
+.lime{color:var(--lime)} .violet{color:#a592ff} .coral{color:var(--coral)} .sky{color:var(--sky)}
+.grad{background:linear-gradient(100deg,#fff 0%,#c8ff3e 45%,#7c5cff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.grad2{background:linear-gradient(100deg,#ff5a36,#ff9d3e 50%,#c8ff3e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.outline{color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.22)}
+.mono{font-family:var(--mono)}
+
+/* components */
+.row{display:flex;gap:32px} .col{display:flex;flex-direction:column}
+.grow{flex:1}
+.bento{display:grid;gap:28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:32px;padding:48px;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.card .n{font-family:var(--mono);font-size:22px;color:var(--dim);letter-spacing:.1em;margin-bottom:28px}
+.card h3{font-size:50px;font-weight:750;letter-spacing:-.035em;line-height:1.2;margin-bottom:18px}
+.card p{font-size:30px;line-height:1.55;color:var(--mute)}
+.card.hi{border-color:rgba(200,255,62,.4);background:linear-gradient(160deg,rgba(200,255,62,.09),rgba(255,255,255,.02))}
+.card.warn{border-color:rgba(255,90,54,.35);background:linear-gradient(160deg,rgba(255,90,54,.09),rgba(255,255,255,.02))}
+.chip{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:22px;padding:12px 22px;border-radius:999px;border:1px solid var(--line);color:var(--mute);letter-spacing:.06em}
+.chip.lime{border-color:rgba(200,255,62,.45);color:var(--lime)}
+.chip.coral{border-color:rgba(255,90,54,.45);color:var(--coral)}
+.mt-s{margin-top:28px}.mt-m{margin-top:56px}.mt-l{margin-top:90px}
+.spacer{flex:1}
+
+/* hype thumbnails */
+.thumb{height:330px;border-radius:28px;padding:40px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;border:1px solid var(--line)}
+.thumb .t{font-size:58px;font-weight:900;letter-spacing:-.04em;line-height:1.1}
+.thumb .play{position:absolute;top:36px;right:36px;width:84px;height:58px;border-radius:16px;background:#ff2a2a;display:grid;place-items:center}
+.thumb .play::after{content:"";border-left:22px solid #fff;border-top:14px solid transparent;border-bottom:14px solid transparent;margin-left:6px}
+.thumb .views{font-family:var(--mono);font-size:20px;color:rgba(255,255,255,.6);margin-top:14px}
+.stamp{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%) rotate(-8deg) scale(1.6);opacity:0;font-size:150px;font-weight:900;color:var(--coral);border:10px solid var(--coral);padding:10px 60px;border-radius:24px;letter-spacing:-.02em;transition:all .5s cubic-bezier(.3,1.6,.5,1) 2.8s;background:rgba(7,7,10,.75);z-index:5}
+.slide.active .stamp{opacity:1;transform:translate(-50%,-50%) rotate(-8deg) scale(1)}
+
+/* strike */
+.strike{position:relative;display:inline-block}
+.strike::after{content:"";position:absolute;left:-2%;top:54%;height:10px;width:0;background:var(--coral);border-radius:6px;transition:width .7s ease 1s}
+.slide.active .strike::after{width:104%}
+
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;margin-top:110px}
+.tl::before{content:"";position:absolute;top:22px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--line),var(--violet),var(--lime))}
+.tl .p{padding-right:40px}
+.tl .dot{width:46px;height:46px;border-radius:50%;background:var(--bg);border:2px solid var(--violet);margin-bottom:44px;display:grid;place-items:center}
+.tl .dot::after{content:"";width:16px;height:16px;border-radius:50%;background:var(--violet)}
+.tl .p.now .dot{border-color:var(--lime)} .tl .p.now .dot::after{background:var(--lime);box-shadow:0 0 24px var(--lime)}
+.tl .y{font-family:var(--mono);font-size:26px;color:var(--mute);margin-bottom:14px}
+.tl h4{font-size:44px;font-weight:750;letter-spacing:-.03em;margin-bottom:14px;line-height:1.2}
+.tl p{font-size:27px;color:var(--mute);line-height:1.5}
+
+/* authors */
+.au{padding:36px 38px}
+.au .nm{font-size:36px;font-weight:700;letter-spacing:-.02em}
+.au .en{font-family:var(--mono);font-size:19px;color:var(--dim);margin:6px 0 26px}
+.au .to{font-size:28px;color:var(--lime);font-weight:600}
+.au .to span{color:var(--mute);font-weight:450}
+
+/* loop */
+.loop{position:relative;width:760px;height:760px;flex:none}
+.loop .ring{position:absolute;inset:80px;border-radius:50%;border:2px dashed rgba(255,255,255,.14);animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loop .node{position:absolute;width:250px;height:250px;border-radius:50%;background:#111116;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.loop .node b{font-size:54px;font-weight:800;letter-spacing:-.04em}
+.loop .node span{font-family:var(--mono);font-size:20px;color:var(--mute);margin-top:8px;letter-spacing:.08em}
+.loop .n1{top:0;left:255px;border-color:rgba(200,255,62,.5)}
+.loop .n2{top:255px;right:0}
+.loop .n3{bottom:0;left:255px}
+.loop .n4{top:255px;left:0}
+.loop .core{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:24px;color:var(--dim);letter-spacing:.12em}
+
+/* prompt compare */
+.prompt{font-family:var(--mono);font-size:30px;line-height:1.75;color:#d9d9e0;white-space:pre-wrap}
+.prompt .k{color:var(--lime)}
+.tag{font-family:var(--mono);font-size:22px;letter-spacing:.12em;margin-bottom:30px;display:flex;align-items:center;gap:14px}
+
+/* equation */
+.eq{display:flex;align-items:center;gap:40px;flex-wrap:wrap}
+.eq .term{font-size:88px;font-weight:800;letter-spacing:-.045em}
+.eq .op{font-size:88px;font-weight:300;color:var(--dim)}
+.eq .small{font-size:60px;color:var(--dim)}
+
+/* timer */
+.timer{font-family:var(--mono);font-size:200px;font-weight:600;letter-spacing:-.04em;line-height:1}
+.btn{font-family:var(--mono);font-size:26px;padding:22px 40px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--fg);cursor:pointer;letter-spacing:.06em}
+.btn:hover{border-color:var(--lime);color:var(--lime)}
+.btn.primary{background:var(--lime);color:#0a0a0a;border-color:var(--lime);font-weight:600}
+.btn.primary:hover{color:#0a0a0a;filter:brightness(1.08)}
+.steps .st{cursor:pointer;transition:border-color .2s,transform .2s}
+.steps .st:hover{transform:translateY(-4px)}
+.steps .st.on{border-color:var(--lime);background:linear-gradient(160deg,rgba(200,255,62,.12),rgba(255,255,255,.02))}
+
+.list li{list-style:none;font-size:40px;line-height:1.5;padding:26px 0;border-bottom:1px solid var(--line);display:flex;gap:36px;align-items:baseline;letter-spacing:-.02em}
+.list li .i{font-family:var(--mono);font-size:24px;color:var(--lime);width:60px;flex:none}
+.list li small{display:block;font-size:28px;color:var(--mute);margin-top:6px}
+
+.bigquote{font-size:112px;font-weight:800;letter-spacing:-.05em;line-height:1.12}
+.navhint{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:18px;color:var(--dim);letter-spacing:.1em;z-index:60;opacity:.8}
+.vwrap{position:relative;flex:none;width:1240px;height:698px;border-radius:32px;overflow:hidden;border:1px solid var(--line);background:#0d0d11;box-shadow:0 30px 120px rgba(0,0,0,.6)}
+.vwrap iframe,.vwrap #ytPlayer{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vposter{position:absolute;inset:0;display:grid;place-items:center;cursor:pointer;background:radial-gradient(circle at 50% 45%,rgba(255,42,42,.18),rgba(255,255,255,.02) 60%);background-size:cover;background-position:center}
+.vposter::before{content:"";position:absolute;inset:0;background:rgba(7,7,10,.45)}
+.vplay{position:relative;width:180px;height:126px;border-radius:36px;background:#ff2a2a;display:grid;place-items:center;box-shadow:0 20px 80px rgba(255,42,42,.45);transition:transform .2s}
+.vposter:hover .vplay{transform:scale(1.06)}
+.vplay::after{content:"";border-left:50px solid #fff;border-top:30px solid transparent;border-bottom:30px solid transparent;margin-left:10px}
+.vseg{position:absolute;left:32px;bottom:28px;font-family:var(--mono);font-size:22px;letter-spacing:.08em;color:#fff;background:rgba(0,0,0,.55);padding:10px 18px;border-radius:999px;z-index:2}
+.vmsg{position:relative;font-family:var(--mono);font-size:24px;color:var(--mute);margin-top:30px;text-align:center}
+.vbar{display:flex;gap:16px;align-items:center;justify-content:center;margin-top:30px}
+.vbar .btn{font-size:22px;padding:16px 30px}
+.vpanel{position:absolute;right:150px;top:120px;width:620px;background:#121218;border:1px solid var(--line);border-radius:28px;padding:40px;z-index:20;display:none;text-align:left;box-shadow:0 30px 100px rgba(0,0,0,.7)}
+.vpanel.open{display:block}
+.vpanel h4{font-size:34px;font-weight:750;margin-bottom:26px;letter-spacing:-.02em}
+.vpanel label{display:block;font-family:var(--mono);font-size:18px;color:var(--mute);letter-spacing:.1em;margin:22px 0 10px}
+.vpanel input{width:100%;font-family:var(--mono);font-size:24px;padding:16px 20px;border-radius:14px;border:1px solid var(--line);background:#0a0a0d;color:var(--fg);outline:none}
+.vpanel input:focus{border-color:var(--lime)}
+.vpanel .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.vpanel .hint{font-size:20px;color:var(--dim);margin-top:18px;line-height:1.5}
+.vgear{position:absolute;right:28px;top:28px;width:56px;height:56px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.35);color:var(--mute);font-size:26px;cursor:pointer;z-index:3;opacity:.25;transition:opacity .2s}
+.vgear:hover{opacity:1;color:var(--lime);border-color:var(--lime)}
+#videoSlide .vbar,#videoSlide .vseg{opacity:0;pointer-events:none;transition:opacity .3s;margin-top:22px}
+#videoSlide .vmsg{margin-top:14px}
+#videoSlide.playing .vbar,#videoSlide.playing .vseg{opacity:1;pointer-events:auto}
+#videoSlide.playing .vseg{opacity:0}
+.vmsg:empty{display:none}
+.vmsg a{color:var(--lime)}
+/* icebreaker: live word cloud */
+#iceSlide{flex-direction:row;gap:56px;align-items:stretch;padding-top:110px}
+.ileft{flex:none;width:560px;display:flex;flex-direction:column}
+.iqr{width:400px;height:400px;background:#fff;border-radius:28px;padding:24px;display:grid;place-items:center;box-shadow:0 30px 100px rgba(124,92,255,.28)}
+.iqr svg{width:100%;height:100%;display:block}
+.iqr .ph{font-family:var(--mono);font-size:21px;color:#444;text-align:center;line-height:1.6;padding:10px}
+.ijoin{margin-top:26px;font-size:28px;color:var(--mute);line-height:1.5}
+.ijoin .url{display:block;font-family:var(--mono);font-size:22px;color:var(--dim);margin-top:8px;word-break:break-all}
+.icount{margin-top:22px;font-family:var(--mono);font-size:24px;color:var(--mute);letter-spacing:.06em}
+.icount b{font-size:64px;color:var(--lime);font-weight:600;margin-right:10px}
+.iright{flex:1;min-width:0;position:relative}
+.cloud{position:absolute;inset:0}
+.cloud span{position:absolute;white-space:nowrap;font-weight:800;letter-spacing:-.03em;line-height:1;transform:translate(-50%,-50%);transition:left .7s cubic-bezier(.2,.7,.2,1),top .7s cubic-bezier(.2,.7,.2,1),font-size .7s cubic-bezier(.2,.7,.2,1),opacity .5s;opacity:0}
+.cloud span.in{opacity:1}
+.cloud .empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--dim);font-size:34px;line-height:1.6;transform:none;opacity:1;font-weight:500;white-space:normal}
+.itools{position:absolute;right:0;bottom:-6px;display:flex;gap:12px;opacity:.25;transition:opacity .2s;z-index:3}
+.itools .btn.primary{opacity:1}
+.itools:hover{opacity:1}
+.itools .btn{font-size:18px;padding:10px 20px}
+#iceSlide .vpanel{right:150px;top:110px}
+.qrpair{display:flex;gap:22px}
+.qstep{display:flex;flex-direction:column;gap:12px}
+.qstep .lab{font-size:24px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+.qstep .lab i{font-style:normal;width:34px;height:34px;border-radius:50%;background:var(--lime);color:#0a0a0a;display:grid;place-items:center;font-size:18px;font-family:var(--mono)}
+.qstep .iqr{width:262px;height:262px;padding:16px;border-radius:22px}
+.qstep small{font-family:var(--mono);font-size:17px;color:var(--dim);max-width:262px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#iceSlide.nowifi .qstep.wifi{display:none}
+#iceSlide.nowifi .qstep .iqr{width:400px;height:400px;padding:24px;border-radius:28px}
+#iceSlide.nowifi .qstep .lab{display:none}
+.wmodal{position:absolute;inset:0;z-index:80;background:rgba(4,4,6,.82);backdrop-filter:blur(14px);display:grid;place-items:center}
+.wmodal[hidden]{display:none}
+.wcard{width:980px;background:#111116;border:1px solid var(--line);border-radius:36px;padding:64px 72px;box-shadow:0 40px 140px rgba(0,0,0,.7)}
+.wcard h2{font-size:72px;font-weight:800;letter-spacing:-.04em;margin-bottom:18px}
+.wlead{font-size:28px;color:var(--mute);line-height:1.55;margin-bottom:26px}
+.wcard label{display:block;font-size:22px;color:var(--mute);margin:24px 0 12px;font-weight:600}
+.wcard label .wopen{font-weight:400;color:var(--dim)}
+.wcard input{width:100%;font-family:var(--sans);font-size:34px;font-weight:600;padding:20px 24px;border-radius:18px;border:1.5px solid var(--line);background:#0a0a0d;color:var(--fg);outline:none}
+.wcard input:focus{border-color:var(--lime)}
+.wpw{display:flex;gap:14px}.wpw .btn{flex:none}
+.wstat{margin-top:22px;font-size:24px;line-height:1.5;color:var(--mute);min-height:36px}
+.wstat.ok{color:var(--lime)}.wstat.warn{color:#ffb36b}
+.wcard .btn{font-size:21px;padding:18px 26px}
+.golink{flex:none;display:inline-flex;align-items:center;gap:12px;font-size:26px;font-weight:700;letter-spacing:-.01em;color:#0a0a0a;background:var(--lime);padding:20px 32px;border-radius:999px;text-decoration:none;box-shadow:0 12px 40px rgba(200,255,62,.25);transition:transform .2s,box-shadow .2s}
+.golink:hover{transform:translateY(-3px);box-shadow:0 18px 50px rgba(200,255,62,.4)}
+.golink span{font-family:var(--mono)}
+/* live poll (horizontal ranking) */
+.prow.correct .pbar{background:var(--lime)!important;box-shadow:0 0 34px rgba(200,255,62,.55)}
+.prow.correct .plabel{color:var(--lime)}
+.prow.correct .prank{color:var(--lime)}
+.prow.wrong{opacity:.38}
+.pbadge{display:inline-block;margin-left:14px;font-size:22px;font-weight:800;padding:4px 14px;border-radius:999px;background:var(--lime);color:#0a0a0a;vertical-align:middle;transform:scale(.6);opacity:0;transition:all .45s cubic-bezier(.3,1.6,.5,1)}
+.prow.correct .pbadge{transform:none;opacity:1}
+.quizmode .prow.lead .pbar{box-shadow:none}
+
+.pollish{flex-direction:row;gap:56px;align-items:stretch;padding-top:110px}
+.pollish .ileft{width:440px}
+.pollish .iqr{width:340px;height:340px}
+.pright{flex:1;min-width:0;position:relative;display:flex;flex-direction:column}
+.ptitle{font-size:64px;font-weight:780;letter-spacing:-.04em;line-height:1.15;margin-bottom:34px;text-wrap:balance}
+.board{position:relative;flex:1}
+.prow{position:absolute;left:0;right:0;height:104px;display:grid;grid-template-columns:64px 1fr 150px;align-items:center;column-gap:22px;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.prank{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--dim);text-align:right}
+.pmain{min-width:0}
+.plabel{font-size:30px;font-weight:650;letter-spacing:-.02em;margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#d9d9e0}
+.ptrack{height:30px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
+.pbar{height:100%;width:0;border-radius:999px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.pnum{text-align:right;font-family:var(--mono)}
+.pnum b{display:block;font-size:44px;font-weight:600;color:var(--fg);line-height:1}
+.pnum span{font-size:20px;color:var(--mute)}
+.prow.lead .prank{color:var(--lime)}
+.prow.lead .plabel{color:var(--fg)}
+.prow.lead .pbar{box-shadow:0 0 30px rgba(200,255,62,.45)}
+.pollish .vpanel{right:150px;top:90px;width:760px}
+.pollish .vpanel input{font-size:20px;padding:12px 16px}
+.pollish .vpanel label{margin:12px 0 6px}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+<div class="progress" id="progress"></div>
+<div class="wmodal" id="wModal" hidden>
+  <div class="wcard">
+    <div class="kicker">Before we start</div>
+    <h2>강의장 Wi-Fi 확인</h2>
+    <p class="wlead">이 노트북이 지금 연결된 Wi-Fi로 수강생 연결 QR을 만듭니다. 장소가 바뀌면 여기서 다시 확인하세요.</p>
+    <label for="wSsid">Wi-Fi 이름</label>
+    <input id="wSsid" autocomplete="off" placeholder="Wi-Fi 이름">
+    <label for="wPass">비밀번호 <span class="wopen">(비밀번호 없는 Wi-Fi는 비워두세요)</span></label>
+    <div class="wpw"><input id="wPass" type="password" autocomplete="off" placeholder="비밀번호"><button class="btn" id="wShow" type="button">보기</button></div>
+    <div class="wstat" id="wStat">노트북 Wi-Fi를 읽는 중…</div>
+    <div class="row" style="gap:14px;flex-wrap:wrap;margin-top:34px">
+      <button class="btn primary" id="wOk" type="button">이 Wi-Fi로 시작</button>
+      <button class="btn" id="wRe" type="button">다시 읽기</button>
+      <button class="btn" id="wSkip" type="button">Wi-Fi QR 없이 진행</button>
+    </div>
+  </div>
+</div>
+
+<!-- 01 TITLE -->
+<section class="slide center">
+  <div class="glow" style="width:900px;height:900px;background:var(--violet);top:-300px;right:-200px"></div>
+  <div class="glow" style="width:700px;height:700px;background:var(--lime);bottom:-400px;left:-100px;opacity:.25"></div>
+  <div class="kicker r">Workshop · 90 min · Hands-on</div>
+  <div class="xxl r">유튜브가<br><span class="grad">말하지 않는 AI</span></div>
+  <div class="s mute r mt-m">현업에서 AI로 일하는 법, 그리고 바이브코딩</div>
+  <div class="row r mt-m"><span class="chip lime">● 실습 위주</span><span class="chip">노트북 필수</span><span class="chip">코딩 경험 불필요</span></div>
+</section>
+
+<!-- ICEBREAKER (live word cloud) -->
+<section class="slide nowifi" id="iceSlide" data-ice-q="지금 내 상태는?">
+  <div class="glow" style="width:800px;height:800px;background:var(--violet);top:-300px;left:-250px;opacity:.35"></div>
+  <div class="glow" style="width:700px;height:700px;background:var(--lime);bottom:-450px;right:-100px;opacity:.12"></div>
+  <div class="ileft">
+    <div class="kicker r">Ice breaking · live</div>
+    <div class="m r" id="iQ" style="margin-bottom:38px">지금 내 상태는?</div>
+    <div class="qrpair r">
+      <div class="qstep wifi"><div class="lab"><i>1</i>Wi-Fi 연결</div><div class="iqr" id="wQr"></div><small id="wName"></small></div>
+      <div class="qstep"><div class="lab"><i>2</i>참여하기</div><div class="iqr" id="iQr"><div class="ph">slides-run.bat 으로<br>열면 QR이 생깁니다</div></div><small id="iUrl"></small></div>
+    </div>
+    <div class="ijoin r" id="iJoin">휴대폰 카메라로 ① → ② 순서로 찍고<br>한 단어로 답해주세요</div>
+    <div class="icount r"><b id="iTotal">0</b>개의 답</div>
+  </div>
+  <div class="iright">
+    <div class="cloud" id="iCloud"><div class="empty" id="iEmpty">첫 번째 답을 기다리는 중…</div></div>
+    <div class="itools">
+      <button class="btn" id="iWifi">Wi-Fi</button>
+      <button class="btn" id="iReset">초기화</button>
+      <button class="btn" id="iCfg">⚙ 질문</button>
+    </div>
+  </div>
+  <div class="vpanel" id="iPanel">
+    <h4>아이스브레이킹 질문</h4>
+    <label>질문</label><input id="iInQ" placeholder="지금 내 상태는?">
+    <div class="row mt-m" style="gap:14px;flex-wrap:wrap">
+      <button class="btn primary" id="iApply">저장</button>
+      <button class="btn" id="iBake">HTML 파일로 저장</button>
+      <button class="btn" id="iClose">닫기</button>
+    </div>
+    <div class="hint">초기화: 리허설 때 들어온 답을 지웁니다. Wi-Fi는 오른쪽 아래 "Wi-Fi" 버튼에서 다시 확인할 수 있습니다.</div>
+  </div>
+</section>
+
+<!-- LIVE POLL -->
+<section class="slide pollish" id="pollSlide" data-poll-q="지금 나의 AI 활용 단계는?"
+  data-poll-opts="클로드 코드, 코덱스 등 터미널에서 작업 가능하다|AI로 보고서나 각종 업무에 활용 중이다|챗GPT 등 채팅에서 원하는 답변을 얻는 중이다|AI를 못 믿겠다. 난 안 쓴다|AI 먹는 건가요?">
+  <div class="glow" style="width:800px;height:800px;background:var(--violet);top:-300px;left:-250px;opacity:.3"></div>
+  <div class="ileft">
+    <div class="kicker r">Live poll</div>
+    <div class="iqr r" data-r="qr"><div class="ph">slides-run.bat 으로<br>열면 QR이 생깁니다</div></div>
+    <div class="ijoin r">앞에서 접속한 분은 화면이 자동으로 바뀝니다. 처음이면 QR을 찍어주세요<span class="url" data-r="url"></span></div>
+    <div class="icount r"><b data-r="total">0</b>명 참여</div>
+  </div>
+  <div class="pright">
+    <div class="ptitle r" data-r="q">지금 나의 AI 활용 단계는?</div>
+    <div class="board r" data-r="board"></div>
+    <div class="itools">
+      <button class="btn" data-r="reset">초기화</button>
+      <button class="btn" data-r="cfg">⚙ 질문·보기</button>
+    </div>
+  </div>
+  <div class="vpanel" data-r="panel">
+    <h4>투표 질문과 보기</h4>
+    <label>질문</label><input data-r="inQ">
+    <label>보기 1</label><input class="pInO">
+    <label>보기 2</label><input class="pInO">
+    <label>보기 3</label><input class="pInO">
+    <label>보기 4</label><input class="pInO">
+    <label>보기 5</label><input class="pInO">
+    <div class="row mt-m" style="gap:14px;flex-wrap:wrap">
+      <button class="btn primary" data-r="apply">저장</button>
+      <button class="btn" data-r="bake">HTML 파일로 저장</button>
+      <button class="btn" data-r="close">닫기</button>
+    </div>
+    <div class="hint">보기를 바꾸면 그동안의 응답은 지워집니다. 빈 칸은 보기에서 빠집니다.</div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="slide pollish" id="quizSlide" data-quiz-q="DX팀의 약자는?"
+  data-quiz-opts="Digital Experience — 디지털 경험|Daily eXcel — 하루 종일 엑셀하는 팀|Digital Transformation — 디지털 전환|Dinner Xpert — 회식 맛집 전문팀" data-quiz-answer="3">
+  <div class="glow" style="width:800px;height:800px;background:var(--violet);top:-300px;left:-250px;opacity:.3"></div>
+  <div class="ileft">
+    <div class="kicker r">Quiz</div>
+    <div class="iqr r" data-r="qr"><div class="ph">slides-run.bat 으로<br>열면 QR이 생깁니다</div></div>
+    <div class="ijoin r">앞에서 접속한 분은 화면이 자동으로 바뀝니다. 처음이면 QR을 찍어주세요<span class="url" data-r="url"></span></div>
+    <div class="icount r"><b data-r="total">0</b>명 참여</div>
+  </div>
+  <div class="pright">
+    <div class="ptitle r" data-r="q">DX팀의 약자는?</div>
+    <div class="board r" data-r="board"></div>
+    <div class="itools">
+      <button class="btn primary" data-r="reveal">정답 공개</button>
+      <button class="btn" data-r="reset">초기화</button>
+      <button class="btn" data-r="cfg">⚙ 질문·보기</button>
+    </div>
+  </div>
+  <div class="vpanel" data-r="panel">
+    <h4>퀴즈 질문과 보기</h4>
+    <label>질문</label><input data-r="inQ">
+    <label>보기 1</label><input class="pInO">
+    <label>보기 2</label><input class="pInO">
+    <label>보기 3</label><input class="pInO">
+    <label>보기 4</label><input class="pInO">
+    <label>보기 5</label><input class="pInO">
+    <label>정답 번호 (1~5)</label><input data-r="inA">
+    <div class="row mt-m" style="gap:14px;flex-wrap:wrap">
+      <button class="btn primary" data-r="apply">저장</button>
+      <button class="btn" data-r="bake">HTML 파일로 저장</button>
+      <button class="btn" data-r="close">닫기</button>
+    </div>
+    <div class="hint">보기를 바꾸면 그동안의 응답은 지워집니다. 빈 칸은 보기에서 빠집니다.</div>
+  </div>
+</section>
+
+
+<!-- 02 AGENDA -->
+<section class="slide">
+  <div class="kicker r">Today</div>
+  <div class="l r">오늘의 90분</div>
+  <div class="bento mt-l" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card r"><div class="n">01 · 10 MIN</div><h3>현실 점검</h3><p>유튜브 속 AI vs 현업 속 AI</p></div>
+    <div class="card r"><div class="n">02 · 10 MIN</div><h3>문제 정의 & AI 역사</h3><p>디자인씽킹, 그리고 간단히 보는 AI</p></div>
+    <div class="card r"><div class="n">03 · 20 MIN</div><h3>바이브코딩</h3><p>개념, 잘하는 법, 그리고 한계</p></div>
+    <div class="card hi r" style="grid-column:span 2"><div class="n">04 · 40 MIN</div><h3>실습 — 내 일의 문제를 앱으로</h3><p>각자 직무의 불편 하나를 골라 직접 만들어 봅니다</p></div>
+    <div class="card r"><div class="n">05 · 10 MIN</div><h3>공유</h3><p>시연 & 내일 해볼 것 1개</p></div>
+  </div>
+</section>
+
+<!-- 03 HYPE -->
+<section class="slide">
+  <div class="kicker r">01 — Reality check</div>
+  <div class="m r">요즘 알고리즘이 보여주는 AI</div>
+  <div class="bento mt-l" style="grid-template-columns:repeat(3,1fr);position:relative">
+    <div class="thumb r" style="background:linear-gradient(145deg,#ff3d3d,#6b0f0f)"><div class="play"></div><div class="t">딸깍 한 번에<br>앱 완성 🔥</div><div class="views">조회수 184만회 · 3일 전</div></div>
+    <div class="thumb r" style="background:linear-gradient(145deg,#ffcc00,#8a4b00)"><div class="play"></div><div class="t" style="color:#111">AI로 월 1,000<br>자동 수익화</div><div class="views" style="color:rgba(0,0,0,.55)">조회수 97만회 · 1주 전</div></div>
+    <div class="thumb r" style="background:linear-gradient(145deg,#2d6bff,#0b1c52)"><div class="play"></div><div class="t">코딩 몰라도<br>3분이면 끝</div><div class="views">조회수 62만회 · 2주 전</div></div>
+    <div class="stamp">과장</div>
+  </div>
+  <div class="body r mt-m">보기엔 쉬워 보이지만, 편집되지 않은 나머지 99%는 보여주지 않습니다.</div>
+</section>
+
+<!-- 04 REALLY? -->
+<section class="slide center" style="align-items:center;text-align:center">
+  <div class="glow" style="width:800px;height:800px;background:var(--coral);top:140px;left:560px;opacity:.28"></div>
+  <div class="xxl r" style="font-size:360px">정말?</div>
+  <div class="s mute r mt-m">그 앱, 지금도 누가 쓰고 있을까요?</div>
+</section>
+
+<!-- 30만원 강의 -->
+<section class="slide">
+  <div class="kicker r">The ₩300,000 course</div>
+  <div class="m r">30만원짜리 강의의 흔한 공식</div>
+  <div class="bento mt-l" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card r"><div class="n">STEP 1</div><h3>프롬프트를<br>보여준다</h3></div>
+    <div class="card r"><div class="n">STEP 2</div><h3>그대로<br>따라 친다</h3></div>
+    <div class="card r"><div class="n">STEP 3</div><h3>결과물이<br>나온다 ✨</h3></div>
+    <div class="card warn r"><div class="n">STEP 4</div><h3 class="coral">…끝.</h3><p>내 일엔 어떻게 쓰지?</p></div>
+  </div>
+  <div class="body r mt-m">남의 문제에 맞춘 정답을 외우는 건, 내 문제를 푸는 능력이 되지 않습니다.</div>
+</section>
+
+<!-- 남는 게 없다 -->
+<section class="slide center">
+  <div class="kicker r">Honest truth</div>
+  <div class="l r">집에 가면<br><span class="mute">남는 게 없다</span></div>
+  <div class="row mt-m r" style="gap:24px">
+    <span class="chip">📸 슬라이드 사진</span><span class="chip">📝 노션 정리</span><span class="chip">🔖 북마크</span><span class="chip coral">→ 다시 안 봄</span>
+  </div>
+  <div class="s r mt-l">남는 건 딱 하나 — <span class="lime">직접 만들어 본 경험</span></div>
+</section>
+
+<!-- 05 TRUTH -->
+<section class="slide center">
+  <div class="kicker r">The real skill</div>
+  <div class="m r mute"><span class="strike">AI를 잘 다루는 능력</span></div>
+  <div class="xl r mt-s">보다 중요한 건,</div>
+  <div class="xl r"><span class="grad">내 일의 문제를<br>정의하는 능력</span></div>
+</section>
+
+<!-- 06 DESIGN THINKING -->
+<section class="slide">
+  <div class="glow" style="width:900px;height:600px;background:var(--violet);bottom:-250px;right:-100px;opacity:.3"></div>
+  <div class="kicker r">Design Thinking</div>
+  <div class="m r">좋은 결과는 <span class="lime">두 번째 단계</span>에서 갈린다</div>
+  <div class="bento mt-m" style="grid-template-columns:1fr 1.5fr 1fr 1fr 1fr;gap:20px;align-items:stretch">
+    <div class="card r" style="padding:40px 34px"><div class="n">01</div><h3 style="font-size:40px">공감</h3><p style="font-size:26px">현장에서 실제로 무엇이 불편한지 관찰</p></div>
+    <div class="card hi r" style="padding:40px 34px"><div class="n" style="color:var(--lime)">02 · DEFINE ★</div><h3 style="font-size:52px">문제 정의</h3><p style="font-size:26px;color:#cfd3c4">“누구의, 어떤 불편을, 왜” 한 문장으로 좁힌다</p></div>
+    <div class="card r" style="padding:40px 34px"><div class="n">03</div><h3 style="font-size:40px">아이디어</h3><p style="font-size:26px">해결 방법을 넓게 떠올린다</p></div>
+    <div class="card r" style="padding:40px 34px;border-color:rgba(62,200,255,.35)"><div class="n sky">04 · AI ⚡</div><h3 style="font-size:40px">프로토타입</h3><p style="font-size:26px">바이브코딩으로 몇 분 만에</p></div>
+    <div class="card r" style="padding:40px 34px;border-color:rgba(62,200,255,.35)"><div class="n sky">05 · AI ⚡</div><h3 style="font-size:40px">테스트</h3><p style="font-size:26px">써보고 고치고 반복</p></div>
+  </div>
+  <div class="card r mt-m" style="padding:36px 52px;display:flex;gap:44px;align-items:center">
+    <div class="chip lime" style="flex:none">HOW MIGHT WE</div>
+    <div style="font-size:36px;font-weight:650;letter-spacing:-.025em;line-height:1.4">현장 CS 담당자가 <span class="lime">하자 접수를 누락 없이</span> 할 수 있게 하려면 어떻게 해야 할까?</div>
+  </div>
+  <div class="body r mt-s" style="font-size:30px">AI는 04·05를 몇 분으로 줄여줍니다. 하지만 <b style="color:var(--fg)">02가 틀리면, 틀린 앱을 빨리 만들 뿐입니다.</b></div>
+</section>
+
+<!-- VIDEO -->
+<section class="slide" id="videoSlide" style="align-items:center;padding-top:90px"
+  data-url="https://www.youtube.com/watch?v=oYcCa3dVfnY" data-start="" data-end="">
+  <div class="glow" style="width:900px;height:700px;background:#ff2a2a;top:180px;left:510px;opacity:.14"></div>
+  <div class="kicker r" style="justify-content:center;margin-bottom:30px">Watch · AX 인재전쟁 우승 인터뷰 · 출처: YouTube 조코딩AX파트너스</div>
+  <div class="vwrap r" id="vwrap">
+    <div class="vposter" id="vposter"><div class="vplay"></div></div>
+    <button class="vgear" id="vCfg" title="구간 설정 (S)">⚙</button>
+  </div>
+  <div class="vbar">
+    <button class="btn" id="vReplay">↺ 구간 다시 재생</button>
+    <button class="btn" id="vOpen">↗ 유튜브에서 열기</button>
+  </div>
+  <div class="vmsg" id="vmsg"></div>
+  <div class="vpanel" id="vpanel">
+    <h4>영상 · 구간 설정</h4>
+    <label>YOUTUBE 주소</label>
+    <input id="inUrl" placeholder="https://www.youtube.com/watch?v=...">
+    <div class="two">
+      <div><label>시작 (분:초)</label><input id="inStart" placeholder="1:20"></div>
+      <div><label>끝 (분:초, 비우면 끝까지)</label><input id="inEnd" placeholder="3:45"></div>
+    </div>
+    <div class="row mt-m" style="gap:14px;flex-wrap:wrap">
+      <button class="btn primary" id="vApply">저장</button>
+      <button class="btn" id="vBake">HTML 파일로 저장</button>
+      <button class="btn" id="vClose">닫기</button>
+    </div>
+    <div class="hint">저장: 이 PC 브라우저에 계속 기억됩니다(다시 고칠 때까지).<br>HTML 파일로 저장: 설정이 들어간 새 HTML을 내려받습니다 — 강의장 PC 등 어디서 열어도 그대로 유지됩니다.</div>
+  </div>
+</section>
+
+<!-- 07 SECTION 02 -->
+<section class="slide center">
+  <div class="xxl outline r" style="font-size:420px;position:absolute;right:120px;top:120px">02</div>
+  <div class="kicker r">Section 02 · 10 min</div>
+  <div class="xl r">간단히 보는<br><span class="grad">AI의 역사</span></div>
+</section>
+
+<!-- 08 TIMELINE -->
+<section class="slide">
+  <div class="kicker r">Timeline</div>
+  <div class="l r">모든 건 한 편의 논문에서</div>
+  <div class="tl r">
+    <div class="p"><div class="dot"></div><div class="y">2017</div><h4>Transformer</h4><p>구글 연구진 8명의 논문 「Attention Is All You Need」</p></div>
+    <div class="p"><div class="dot"></div><div class="y">2022.11</div><h4>ChatGPT</h4><p>GPT의 T가 바로 Transformer</p></div>
+    <div class="p"><div class="dot"></div><div class="y">2023</div><h4>프롬프트 열풍</h4><p>“질문을 잘하는 법”이 기술이 되다</p></div>
+    <div class="p"><div class="dot"></div><div class="y">2025.02</div><h4>바이브코딩</h4><p>말로 소프트웨어를 만드는 시대</p></div>
+    <div class="p now"><div class="dot"></div><div class="y">NOW</div><h4>AI 에이전트</h4><p>AI가 직접 계획하고 실행한다</p></div>
+  </div>
+</section>
+
+<!-- 13 SECTION 03 -->
+<section class="slide center">
+  <div class="xxl outline r" style="font-size:420px;position:absolute;right:120px;top:120px">03</div>
+  <div class="glow" style="width:900px;height:900px;background:var(--lime);bottom:-500px;right:-200px;opacity:.2"></div>
+  <div class="kicker r">Section 03 · 20 min</div>
+  <div class="xl r"><span class="grad">Vibe Coding</span></div>
+  <div class="s mute r mt-s">코드 대신, 말로 만든다</div>
+</section>
+
+<!-- 14 DEFINITION -->
+<section class="slide center">
+  <div class="kicker r">Definition · 2025.02 · Andrej Karpathy</div>
+  <div class="l r">코드를 한 줄씩 짜는 대신,<br><span class="grad">원하는 걸 말로 설명하고</span><br>AI가 만든 걸 보며 고쳐가는 방식</div>
+  <div class="body r mt-m">OpenAI 공동창업자 안드레이 카파시가 처음 이름 붙인 개념.<br>코드는 몰라도 된다. 대신 <b style="color:var(--fg)">무엇을 원하는지는 정확히 알아야 한다.</b></div>
+</section>
+
+<!-- 15 LOOP -->
+<section class="slide">
+  <div class="row" style="align-items:center;gap:120px;height:100%">
+    <div class="col grow">
+      <div class="kicker r">How it works</div>
+      <div class="l r">한 번에<br>완성되지 않는다</div>
+      <div class="body r mt-m">바이브코딩은 “주문”이 아니라 “대화”입니다.<br>이 루프를 10번, 20번 도는 게 정상입니다.</div>
+    </div>
+    <div class="loop r">
+      <div class="ring"></div>
+      <div class="core">LOOP</div>
+      <div class="node n1"><b class="lime">말한다</b><span>DESCRIBE</span></div>
+      <div class="node n2"><b>만든다</b><span>GENERATE</span></div>
+      <div class="node n3"><b>본다</b><span>TEST</span></div>
+      <div class="node n4"><b>고친다</b><span>REFINE</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 4 ELEMENTS -->
+<section class="slide">
+  <div class="kicker r">How to vibe well</div>
+  <div class="m r">잘 시키는 사람은 이 4가지를 말한다</div>
+  <div class="bento mt-l" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card hi r"><div class="n">01 · WHO</div><h3>누가 쓰나</h3><p>현장 BM,<br>휴대폰으로, 한 손으로</p></div>
+    <div class="card r"><div class="n">02 · PAIN</div><h3>뭐가 불편한가</h3><p>하자 접수를 카톡·엑셀에<br>따로 적어 누락된다</p></div>
+    <div class="card r"><div class="n">03 · SCREEN</div><h3>어떤 화면인가</h3><p>입력칸, 버튼, 목록,<br>필터가 어디에 무엇이</p></div>
+    <div class="card r"><div class="n">04 · EDGE</div><h3>이럴 땐?</h3><p>빈칸 제출, 중복 접수,<br>긴급 건은 어떻게</p></div>
+  </div>
+  <div class="s r mt-m">이건 AI 기술이 아니라 — <span class="lime">여러분의 현업 지식</span>입니다.</div>
+</section>
+
+<!-- 17 BAD vs GOOD -->
+<section class="slide">
+  <div class="kicker r">Bad vs Good</div>
+  <div class="m r">같은 요청, 다른 결과</div>
+  <div class="row mt-m" style="gap:32px;align-items:stretch">
+    <div class="card warn r" style="flex:.8"><div class="tag coral">✕ BAD</div><div class="prompt">하자 관리 앱
+만들어줘</div><p class="mt-m">→ AI가 모든 걸 추측합니다.<br>그럴듯하지만 아무도 안 쓰는 앱.</p></div>
+    <div class="card hi r" style="flex:1.6"><div class="tag lime">✓ GOOD</div><div class="prompt"><span class="k">[누가]</span> 아파트 현장 CS 담당자가 휴대폰으로 쓴다
+<span class="k">[문제]</span> 하자 접수가 카톡·엑셀로 흩어져 누락된다
+<span class="k">[화면]</span> 동·호수, 공종(선택), 내용, 긴급도(상/중/하)
+       제출하면 아래 목록에 쌓이고 긴급도 필터
+<span class="k">[예외]</span> 동·호수 빈칸이면 제출 막기
+       같은 호수+공종이면 “중복 의심” 표시</div></div>
+  </div>
+</section>
+
+<!-- 18 TIPS -->
+<section class="slide">
+  <div class="kicker r">Pro tips</div>
+  <div class="m r">막히지 않는 4가지 습관</div>
+  <ul class="list mt-m">
+    <li class="r"><span class="i">01</span><div>작게 시작하라<small>“전부 다” 말고 화면 하나, 기능 하나부터</small></div></li>
+    <li class="r"><span class="i">02</span><div>한 번에 하나씩 고쳐라<small>요청 5개를 한꺼번에 넣으면 다 조금씩 망가진다</small></div></li>
+    <li class="r"><span class="i">03</span><div>오류는 그대로 붙여넣어라<small>해석하지 말고 빨간 글씨를 통째로 복사해서 “이거 고쳐줘”</small></div></li>
+    <li class="r"><span class="i">04</span><div>잘 될 때 저장하라<small>되던 버전을 남겨두면 망가져도 돌아갈 수 있다</small></div></li>
+  </ul>
+</section>
+
+<!-- 19 LIMITS HEADLINE -->
+<section class="slide center">
+  <div class="glow" style="width:900px;height:900px;background:var(--coral);top:-300px;right:-300px;opacity:.3"></div>
+  <div class="kicker r">The catch</div>
+  <div class="xl r">만들 수 있다<br><span class="coral">≠</span> <span class="mute">운영할 수 있다</span></div>
+</section>
+
+<!-- 20 LIMITS -->
+<section class="slide">
+  <div class="kicker r">Limits</div>
+  <div class="m r">바이브코딩 결과물의 4가지 함정</div>
+  <div class="bento mt-l" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card warn r"><div class="n">🔓 SECURITY</div><h3>보안</h3><p>권한 체크 누락, API 키 노출, 개인정보 무방비</p></div>
+    <div class="card warn r"><div class="n">⚙️ OPERATION</div><h3>운영</h3><p>서버·백업·장애 대응. 100명이 동시에 쓰면?</p></div>
+    <div class="card warn r"><div class="n">🧩 MAINTAIN</div><h3>유지보수</h3><p>코드를 아무도 모른다. 만든 사람조차.</p></div>
+    <div class="card warn r"><div class="n">⚖️ OWNERSHIP</div><h3>책임</h3><p>문제가 생기면 누가 고치고 누가 책임지나</p></div>
+  </div>
+  <div class="s r mt-m">바이브코딩은 <span class="lime">프로토타입</span>까지. 실제 운영은 전문 조직과 함께.</div>
+</section>
+
+<!-- 21 WHY LEARN -->
+<section class="slide center">
+  <div class="kicker r">So why learn it?</div>
+  <div class="l r">“이런 거 필요해요”를<br><span class="grad">말 대신 화면으로</span> 보여줄 수 있다</div>
+  <div class="row mt-l r" style="gap:28px">
+    <div class="card" style="flex:1"><div class="n">BEFORE</div><h3 class="mute">3주 회의 + 문서 20장</h3><p>“그게 아니라…”의 반복</p></div>
+    <div class="card hi" style="flex:1"><div class="n">AFTER</div><h3>프로토타입 1개</h3><p>“이거요. 여기만 이렇게.”</p></div>
+  </div>
+</section>
+
+<!-- TREECS CASE -->
+<section class="slide">
+  <div class="glow" style="width:900px;height:700px;background:#2fbf71;top:-300px;right:-200px;opacity:.22"></div>
+  <div class="kicker r">Real case · CS사업본부 조경 PART</div>
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="m r">TreeCS — <span class="lime">조경 하자를 미리 막는다</span></div>
+    <span class="chip r">PROTOTYPE</span>
+  </div>
+  <div class="row mt-m r" style="gap:24px;align-items:stretch">
+    <div class="card" style="flex:1;padding:40px 44px"><div class="n">BEFORE</div><h3 class="mute" style="font-size:44px">하자가 나면 다시 심는다</h3><p style="font-size:28px">고사 후 재식재 — 늘 사후 대응</p></div>
+    <div style="display:grid;place-items:center;font-size:64px;color:var(--dim)">→</div>
+    <div class="card hi" style="flex:1;padding:40px 44px"><div class="n" style="color:var(--lime)">AFTER</div><h3 style="font-size:44px">설계 단계에서 걸러낸다</h3><p style="font-size:28px">위험한 수종·조건을 미리 알고 대체 수종 선택</p></div>
+  </div>
+  <div class="bento mt-s" style="grid-template-columns:repeat(3,1fr);gap:24px">
+    <div class="card r" style="padding:36px 40px"><div class="n">01 · 문제 정의</div><p style="font-size:28px;color:var(--fg)">어떤 수종이, 어떤 계절·지역에서 자주 죽는가?</p></div>
+    <div class="card r" style="padding:36px 40px"><div class="n">02 · 바이브코딩으로 만든 것</div><p style="font-size:28px;color:var(--fg)">수종별 하자율 대시보드, 지역 지도, 함께 심을 수종 추천</p></div>
+    <div class="card r" style="padding:36px 40px"><div class="n">03 · 지금 단계</div><p style="font-size:28px;color:var(--fg)">프로토타입 검증 중. 운영은 데이터·모델 보완 후</p></div>
+  </div>
+  <div class="row r mt-m" style="justify-content:space-between;align-items:center;gap:32px">
+    <div class="s" style="font-size:40px">질문을 만든 건 <span class="lime">조경 현업</span>, 화면을 만든 건 AI.</div>
+    <a class="golink" href="https://treecs.app.xisndx.com/sites" target="_blank" rel="noopener">자이 S&amp;D 수목 관리 플랫폼 열기 <span>↗</span></a>
+  </div>
+</section>
+
+<!-- 22 SECTION 04 -->
+<section class="slide center">
+  <div class="xxl outline r" style="font-size:420px;position:absolute;right:120px;top:120px">04</div>
+  <div class="glow" style="width:1000px;height:1000px;background:var(--lime);top:-400px;left:-300px;opacity:.22"></div>
+  <div class="kicker r">Section 04 · 40 min</div>
+  <div class="xl r">이제,<br><span class="grad">직접 만들 차례</span></div>
+</section>
+
+<!-- 23 RULES -->
+<section class="slide center">
+  <div class="kicker r" style="color:var(--coral)">Ground rules</div>
+  <div class="l r">시작 전, 딱 하나만</div>
+  <div class="card warn r mt-m" style="padding:64px 72px">
+    <h3 style="font-size:64px">🚫 회사 데이터·개인정보 입력 금지</h3>
+    <p style="font-size:34px">실제 고객명, 연락처, 동·호수, 도면, 계약 정보는 넣지 마세요.<br>“홍길동 / 101동 1001호” 같은 <b style="color:var(--fg)">가상 데이터</b>로 충분합니다.</p>
+  </div>
+</section>
+
+<!-- 24 TOOLS -->
+<section class="slide">
+  <div class="kicker r">Tools</div>
+  <div class="m r">설치 없이, 브라우저에서 바로</div>
+  <div class="bento mt-m" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card hi r"><div class="n">MAIN</div><h3>v0</h3><p>Vercel의 바이브코딩 도구. 말하면 바로 화면이 나오고 링크로 공유까지. 입문에 가장 쉬움</p><div class="chip lime mt-s">오늘의 메인</div></div>
+    <div class="card r"><div class="n">ALT</div><h3>Google AI Studio</h3><p>Build 모드. 구글 계정만 있으면 시작, 무료 범위 넓음</p><div class="chip mt-s">대안</div></div>
+    <div class="card r"><div class="n">BONUS</div><h3>Lovable · Bolt</h3><p>완성도 높은 앱 화면. 무료 한도가 빨리 소진됨</p><div class="chip mt-s">빨리 끝낸 분</div></div>
+    <div class="card r"><div class="n">NEXT</div><h3>Replit</h3><p>배포·공유까지 한 번에. 화면이 복잡해 입문엔 다소 어려움</p><div class="chip mt-s">다음 단계</div></div>
+  </div>
+  <div class="body r mt-s" style="font-size:24px">* 요금제·무료 한도는 수시로 바뀝니다. 강의 당일 기준으로 확인하세요.</div>
+</section>
+
+<!-- 25 MISSION + TIMER -->
+<section class="slide">
+  <div class="kicker r">Mission · click a step to set timer</div>
+  <div class="row" style="gap:80px;align-items:flex-start">
+    <div class="col" style="flex:1.25">
+      <div class="m r">3단계, 40분</div>
+      <div class="bento steps mt-m" style="grid-template-columns:1fr;gap:20px">
+        <div class="card st r" data-min="10" style="padding:36px 44px"><div class="n">STEP 1 · 10 MIN</div><h3 style="font-size:44px;margin:0">내 일의 불편 1개를 4요소로 적기</h3></div>
+        <div class="card st r" data-min="20" style="padding:36px 44px"><div class="n">STEP 2 · 20 MIN</div><h3 style="font-size:44px;margin:0">AI에게 말하고, 보고, 고치기</h3></div>
+        <div class="card st r" data-min="10" style="padding:36px 44px"><div class="n">STEP 3 · 10 MIN</div><h3 style="font-size:44px;margin:0">기능 딱 1개 더 붙이기</h3></div>
+      </div>
+    </div>
+    <div class="col r" style="flex:1;align-items:center;padding-top:170px">
+      <div class="timer" id="timer">10:00</div>
+      <div class="row mt-m" style="gap:18px">
+        <button class="btn primary" id="tStart">START</button>
+        <button class="btn" id="tReset">RESET</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 26 IDEAS -->
+<section class="slide">
+  <div class="kicker r">Ideas by role</div>
+  <div class="m r">뭘 만들지 모르겠다면</div>
+  <div class="bento mt-m" style="grid-template-columns:repeat(4,1fr)">
+    <div class="card r"><div class="n">🏗 시공</div><h3>현장 도구</h3><p>· 일일 작업 체크리스트<br>· 자재 수량 계산기<br>· 공종별 TBM 메모장</p></div>
+    <div class="card r"><div class="n">🏠 CS</div><h3>고객 대응</h3><p>· 하자 접수 폼 + 목록<br>· 민원 유형 분류기<br>· 응답 문구 초안 도우미</p></div>
+    <div class="card r"><div class="n">📊 BM · 관리</div><h3>현황 관리</h3><p>· 공정률 대시보드<br>· 회의록 → 할 일 정리기<br>· 협력사 연락처 보드</p></div>
+    <div class="card hi r"><div class="n">✨ 공통</div><h3>내 일 전용</h3><p>· 매주 반복하는 엑셀 작업<br>· 매번 찾는 기준표<br>· “이거 누가 좀 만들어줬으면”</p></div>
+  </div>
+</section>
+
+<!-- 27 TEMPLATE -->
+<section class="slide">
+  <div class="kicker r">Copy & paste</div>
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="m r">첫 프롬프트 템플릿</div>
+    <button class="btn r" id="copyBtn">COPY TEMPLATE</button>
+  </div>
+  <div class="card hi r mt-m" style="padding:56px 64px"><div class="prompt" id="tpl"><span class="k">[나는]</span> 건설사 ○○ 직무 담당자입니다.
+<span class="k">[누가 쓰나]</span> ○○가 (PC / 휴대폰)으로 사용합니다.
+<span class="k">[불편한 점]</span> 지금은 ○○를 ○○로 하고 있어서 ○○ 문제가 있습니다.
+<span class="k">[만들 것]</span> 이 문제를 해결하는 웹 화면을 만들어 주세요.
+<span class="k">[화면 구성]</span> ○○ 입력칸, ○○ 버튼, ○○ 목록/표
+<span class="k">[예외 처리]</span> ○○일 때는 ○○하게 해주세요.
+<span class="k">[조건]</span> 가상 데이터 5개를 미리 넣어서 바로 확인할 수 있게 해주세요.</div></div>
+</section>
+
+<!-- 28 STUCK -->
+<section class="slide">
+  <div class="kicker r">When you're stuck</div>
+  <div class="m r">막혔을 때 이렇게 말하세요</div>
+  <div class="bento mt-l" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card r"><div class="n">에러가 났다</div><div class="prompt" style="font-size:30px">“이 오류가 나. 고쳐줘”<br><span class="dim">+ 오류 메시지 통째로</span></div></div>
+    <div class="card r"><div class="n">자꾸 다른 게 바뀐다</div><div class="prompt" style="font-size:30px">“다른 건 건드리지 말고<br>○○ 부분만 바꿔줘”</div></div>
+    <div class="card r"><div class="n">생각과 다르다</div><div class="prompt" style="font-size:30px">“지금은 ○○인데,<br>나는 ○○를 원해”</div></div>
+  </div>
+  <div class="body r mt-m">그래도 안 되면? 손 들어주세요. 그게 오늘 여기 있는 이유입니다. 🙋</div>
+</section>
+
+<!-- 29 SHARE -->
+<section class="slide">
+  <div class="xxl outline r" style="font-size:420px;position:absolute;right:120px;top:100px">05</div>
+  <div class="kicker r">Section 05 · Share · 10 min</div>
+  <div class="l r">3명의 데모</div>
+  <ul class="list mt-m" style="max-width:1300px">
+    <li class="r"><span class="i">Q1</span><div>어떤 문제를 골랐나요?</div></li>
+    <li class="r"><span class="i">Q2</span><div>AI에게 어떻게 말했나요? <small>가장 효과 있던 한 문장</small></div></li>
+    <li class="r"><span class="i">Q3</span><div>내일 현업에서 해볼 것 1개는?</div></li>
+  </ul>
+</section>
+
+<!-- 30 CLOSING -->
+<section class="slide center">
+  <div class="glow" style="width:1000px;height:1000px;background:var(--violet);top:-300px;left:-300px;opacity:.4"></div>
+  <div class="glow" style="width:800px;height:800px;background:var(--lime);bottom:-400px;right:-100px;opacity:.22"></div>
+  <div class="kicker r">One more thing</div>
+  <div class="bigquote r">AI가 일을 대신하지 않는다.</div>
+  <div class="bigquote r"><span class="grad">문제를 정의한 사람이</span></div>
+  <div class="bigquote r"><span class="grad">AI로 일한다.</span></div>
+  <div class="s mute r mt-l">Thank you.</div>
+</section>
+
+<div class="foot"><span><b>AI × 현업</b> — 바이브코딩 워크숍</span><span id="pageNo">01 / 33</span></div>
+<div class="navhint" id="hint">← → 이동 · F 전체화면</div>
+</div>
+
+<script>
+/* presenter key (cloud): open the deck once with ?key=XXXX; stored for this browser tab */
+(function(){
+  let k='';try{const u=new URL(location.href);k=u.searchParams.get('key')||sessionStorage.getItem('kn-key')||'';
+    if(u.searchParams.get('key')){sessionStorage.setItem('kn-key',k);u.searchParams.delete('key');history.replaceState(null,'',u.pathname+u.search+u.hash)}}catch(e){}
+  window.__KEY=k;const f=window.fetch.bind(window);
+  window.fetch=(url,opt)=>{opt=opt||{};if(k&&typeof url==='string'&&url.startsWith('/api/')){opt.headers=Object.assign({},opt.headers||{},{'X-Admin-Key':k})}return f(url,opt)};
+})();
+const __SRC='<!doctype html>\n'+document.documentElement.outerHTML;
+const stage=document.getElementById('stage');
+const slides=[...document.querySelectorAll('.slide')];
+const total=slides.length;
+let cur=0;
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(-50%,-50%) scale(${s})`}
+addEventListener('resize',fit);fit();
+slides.forEach(sl=>sl.querySelectorAll('.r').forEach((el,i)=>el.style.transitionDelay=(0.12+i*0.09)+'s'));
+function go(n){
+  cur=Math.max(0,Math.min(total-1,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
+  document.getElementById('pageNo').textContent=String(cur+1).padStart(2,'0')+' / '+total;
+  document.getElementById('progress').style.width=((cur+1)/total*100)+'%';
+  try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
+  if(window.VID)VID.onSlide(slides[cur].id==='videoSlide');
+  if(location.protocol.startsWith('http')){try{fetch('/api/stage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({stage:slides[cur].id||('slide'+(cur+1))})}).catch(()=>{})}catch(e){}}
+}
+const h=parseInt(location.hash.slice(1));go(isNaN(h)?0:h-1);
+setTimeout(()=>{const x=document.getElementById('hint');x.style.transition='opacity 1s';x.style.opacity=0},4000);
+addEventListener('keydown',e=>{
+  if(e.target.closest&&e.target.closest('input,textarea'))return;
+  if(window.WIFI_SETUP&&WIFI_SETUP.isOpen())return;
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();go(cur-1)}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(total-1);
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.()}
+});
+addEventListener('click',e=>{
+  if(e.target.closest('button,.st,a,.vwrap,.vpanel,input,.iqr,.itools,.board,.vpanel'))return;
+  e.clientX>innerWidth*0.3?go(cur+1):go(cur-1);
+});
+let tx=null;
+addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)go(cur+(d<0?1:-1));tx=null},{passive:true});
+
+/* timer */
+let base=600,left=600,iv=null;
+const tEl=document.getElementById('timer'),tBtn=document.getElementById('tStart');
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function render(){tEl.textContent=fmt(left);tEl.style.color=left<=60?'var(--coral)':left===0?'var(--coral)':'var(--fg)'}
+function stop(){clearInterval(iv);iv=null;tBtn.textContent='START'}
+tBtn.onclick=()=>{if(iv){stop();return}if(left===0)left=base;tBtn.textContent='PAUSE';iv=setInterval(()=>{left--;render();if(left<=0){left=0;render();stop()}},1000)};
+document.getElementById('tReset').onclick=()=>{stop();left=base;render()};
+document.querySelectorAll('.st').forEach(c=>c.onclick=()=>{document.querySelectorAll('.st').forEach(x=>x.classList.remove('on'));c.classList.add('on');stop();base=left=+c.dataset.min*60;render()});
+document.querySelector('.st').classList.add('on');
+
+/* copy */
+document.getElementById('copyBtn').onclick=async e=>{
+  const t=document.getElementById('tpl').innerText;
+  try{await navigator.clipboard.writeText(t);e.target.textContent='COPIED ✓'}catch(_){e.target.textContent='복사 실패 — 직접 선택'}
+  setTimeout(()=>e.target.textContent='COPY TEMPLATE',1800);
+};
+
+/* ===== YouTube segment player ===== */
+window.VID=(function(){
+  const sec=document.getElementById('videoSlide');
+  const $=id=>document.getElementById(id);
+  const base={url:sec.dataset.url||'',start:sec.dataset.start||'',end:sec.dataset.end||''};
+  const KEY='kn-video:'+base.url+'|'+base.start+'|'+base.end; // HTML 값이 바뀌면 HTML 값이 우선
+  let cfg={...base};
+  try{const sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv&&sv.url)cfg=sv}catch(e){}
+
+  const toSec=t=>{t=String(t||'').trim();if(!t)return null;if(/^\d+(\.\d+)?$/.test(t))return +t;
+    const p=t.split(':').map(Number);if(p.some(isNaN))return null;return p.reduce((a,b)=>a*60+b,0)};
+  const fmt=x=>{x=Math.floor(x);const m=Math.floor(x/60),s=x%60;return m+':'+String(s).padStart(2,'0')};
+  function parseId(u){u=String(u||'').trim();if(/^[\w-]{11}$/.test(u))return u;
+    try{const x=new URL(u);const h=x.hostname.replace(/^(www|m|music)\./,'');
+      if(h==='youtu.be')return x.pathname.slice(1,12);
+      if(h.endsWith('youtube.com')||h.endsWith('youtube-nocookie.com')){
+        if(x.searchParams.get('v'))return x.searchParams.get('v').slice(0,11);
+        const m=x.pathname.match(/\/(embed|shorts|live|v)\/([\w-]{11})/);if(m)return m[2];}
+    }catch(e){}return null}
+  const seg=()=>({id:parseId(cfg.url),s:Math.floor(toSec(cfg.start)||0),e:toSec(cfg.end)});
+  const watchUrl=g=>`https://www.youtube.com/watch?v=${g.id}&t=${g.s}s`;
+  const msg=h=>{$('vmsg').innerHTML=h||''};
+
+  function paint(){
+    const g=seg();
+    $('vposter').style.backgroundImage=g.id?`url(https://i.ytimg.com/vi/${g.id}/hqdefault.jpg)`:'';
+  }
+  function stopFrame(){const f=$('vwrap').querySelector('iframe');if(f)f.remove();sec.classList.remove('playing');$('vposter').style.display=''}
+  function play(){
+    const g=seg();
+    if(!g.id){if(/^https?:\/\//.test(cfg.url)){window.open(cfg.url,'_blank','noopener');msg('단축 링크라 새 탭에서 열었습니다. 장표 안에서 재생하려면 ⚙ 에 youtube.com 주소를 넣어주세요.')}else{msg('⚠ ⚙ 에서 유튜브 주소를 넣어주세요.');openPanel()}return}
+    msg('');stopFrame();
+    const q=new URLSearchParams({autoplay:'1',start:String(g.s),rel:'0',playsinline:'1',modestbranding:'1'});
+    if(g.e)q.set('end',String(Math.ceil(g.e)));
+    if(location.protocol.startsWith('http'))q.set('origin',location.origin);
+    const f=document.createElement('iframe');
+    f.src=`https://www.youtube.com/embed/${g.id}?${q}`;
+    f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen=true;f.referrerPolicy='strict-origin-when-cross-origin';
+    $('vwrap').prepend(f);$('vposter').style.display='none';sec.classList.add('playing');
+    if(location.protocol==='file:')msg('파일을 직접 열면 유튜브가 재생을 막습니다(오류 153). 같은 폴더의 slides-run.bat 으로 열어주세요 · <a href="'+watchUrl(g)+'" target="_blank" rel="noopener">지금 유튜브에서 열기 ↗</a>');
+  }
+  function openPanel(){$('inUrl').value=cfg.url||'';$('inStart').value=cfg.start||'';$('inEnd').value=cfg.end||'';$('vpanel').classList.add('open')}
+  function readPanel(){
+    const c={url:$('inUrl').value.trim(),start:$('inStart').value.trim(),end:$('inEnd').value.trim()};
+    const id=parseId(c.url);
+    if(!id){msg('⚠ 유튜브 주소를 확인해주세요 (youtube.com/watch?v=… 또는 youtu.be/…)');return null}
+    if(!c.start||!toSec(c.start)){try{const t=new URL(c.url).searchParams.get('t');if(t)c.start=fmt(parseInt(t))}catch(e){}}
+    const s1=toSec(c.start)||0,e1=toSec(c.end);
+    if(c.start&&toSec(c.start)===null){msg('⚠ 시작 시간 형식: 1:20');return null}
+    if(c.end&&e1===null){msg('⚠ 끝 시간 형식: 3:45');return null}
+    if(e1!==null&&e1<=s1){msg('⚠ 끝 시간이 시작보다 뒤여야 합니다');return null}
+    return c;
+  }
+
+  $('vposter').onclick=play;
+  $('vReplay').onclick=play;
+  $('vOpen').onclick=()=>{const g=seg();if(g.id)window.open(watchUrl(g),'_blank','noopener')};
+  $('vCfg').onclick=e=>{e.stopPropagation();$('vpanel').classList.contains('open')?$('vpanel').classList.remove('open'):openPanel()};
+  $('vClose').onclick=()=>$('vpanel').classList.remove('open');
+  $('vApply').onclick=()=>{const c=readPanel();if(!c)return;cfg=c;
+    try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}
+    $('vpanel').classList.remove('open');stopFrame();paint();msg('✓ 저장됨 · '+fmt(seg().s)+' → '+(seg().e?fmt(seg().e):'끝'));
+    setTimeout(()=>{if($('vmsg').textContent.startsWith('✓'))msg('')},2500)};
+  $('vBake').onclick=()=>{const c=readPanel();if(!c)return;cfg=c;
+    const esc=v=>String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    window.__bakeDownload({url:c.url,start:c.start,end:c.end});
+    try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}
+    $('vpanel').classList.remove('open');stopFrame();paint();msg('✓ 설정이 들어간 HTML을 내려받았습니다. 기존 파일을 이 파일로 바꿔 쓰세요.')};
+  addEventListener('keydown',e=>{if(slides[cur].id!=='videoSlide'||e.target.closest('input'))return;
+    if(e.key==='s'||e.key==='S'){$('vpanel').classList.contains('open')?$('vpanel').classList.remove('open'):openPanel()}});
+  paint();
+  return{cfg:()=>cfg,onSlide(on){if(!on){stopFrame();$('vpanel').classList.remove('open');msg('')}}};
+})();
+
+/* ===== shared: bake current settings into a new HTML download ===== */
+window.__bakeDownload=function(vid,menti){
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  const set=(src,attr,val)=>val===undefined?src:src.replace(new RegExp(attr+'="[^"]*"'),attr+'="'+esc(val)+'"');
+  vid=vid||(window.VID&&VID.cfg())||{};menti=menti||(window.ICE&&ICE.cfg())||{};
+  let out=__SRC;
+  out=set(out,'data-url',vid.url);out=set(out,'data-start',vid.start);out=set(out,'data-end',vid.end);
+  out=set(out,'data-ice-q',menti.q);
+  for(const P of [window.POLL,window.QUIZ]){if(!P)continue;const c=P.cfg();out=set(out,'data-'+P.attr+'-q',c.q);out=set(out,'data-'+P.attr+'-opts',c.options.join('|'));if(P.attr==='quiz')out=set(out,'data-quiz-answer',String(c.answer))}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));
+  a.download=(decodeURIComponent(location.pathname.split('/').pop()||'')||'ai-vibecoding-keynote.html');
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+};
+
+/* ===== Icebreaker: QR + live word cloud (served by slides-run.bat) ===== */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+window.ICE=(function(){
+  const sec=document.getElementById('iceSlide');const $=id=>document.getElementById(id);
+  const base={q:sec.dataset.iceQ||'지금 내 상태는?'};
+  const KEY='kn-ice:'+base.q;
+  let cfg={...base};
+  try{const sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv&&sv.q)cfg={q:sv.q}}catch(e){}
+  const served=location.protocol.startsWith('http');
+  let timer=null,lastSig='',info=null;
+  const COLORS=['#c8ff3e','#a592ff','#3ec8ff','#ff8a6b','#f4f4f6','#7cf2c4','#ffd36b'];
+  const hash=t=>{let h=0;for(const ch of t)h=(h*31+ch.codePointAt(0))>>>0;return h};
+  const els=new Map();
+
+  function drawQr(url){
+    if(!url){$('iQr').innerHTML='<div class="ph">'+(served?'휴대폰 접속 주소를<br>찾지 못했습니다':'slides-run.bat 으로<br>열면 QR이 생깁니다')+'</div>';return}
+    const q=qrcode(0,'M');q.addData(url);q.make();
+    $('iQr').innerHTML=q.createSvgTag({cellSize:8,margin:0,scalable:true});
+  }
+  async function api(path,opt){const r=await fetch(path,Object.assign({cache:'no-store'},opt||{}));if(!r.ok)throw new Error(r.status);return r.json()}
+  async function pushQ(){if(!served)return;try{await api('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:cfg.q})})}catch(e){}}
+
+  const wesc=v=>String(v).replace(/([\;,:"])/g,'\\$1');
+  function drawWifi(){
+    const W=window.WIFI_SEL;
+    if(!W||!W.ssid){sec.classList.add('nowifi');$('iJoin').innerHTML='휴대폰 카메라로 QR을 찍고<br>한 단어로 답해주세요';return}
+    const str='WIFI:T:'+(W.pass?'WPA':'nopass')+';S:'+wesc(W.ssid)+';'+(W.pass?'P:'+wesc(W.pass)+';':'')+';';
+    const q=qrcode(0,'M');q.addData(unescape(encodeURIComponent(str)),'Byte');q.make();
+    $('wQr').innerHTML=q.createSvgTag({cellSize:8,margin:0,scalable:true});
+    $('wName').textContent=W.ssid;
+    sec.classList.remove('nowifi');$('iJoin').innerHTML='휴대폰 카메라로 ① → ② 순서로 찍고<br>한 단어로 답해주세요';
+  }
+  async function loadWifi(){drawWifi()}
+  async function loadInfo(){
+    if(!served){drawQr('');return}
+    try{info=await api('/api/info');if(info.cloud&&!info.storage){$('iQr').innerHTML='<div class="ph">클라우드 저장소(Upstash)<br>연결이 필요합니다</div>';$('iUrl').textContent='Vercel → Storage에서 Upstash 연결';return}drawQr(info.vote||'');
+      $('iUrl').textContent=info.vote?info.vote.replace(/^https?:\/\//,''):'Wi-Fi 연결을 확인해주세요';
+    }catch(e){drawQr('');$('iUrl').textContent='응답 서버에 연결하지 못했습니다'}
+  }
+
+  // ---- word cloud layout (archimedean spiral, largest first)
+  function layout(words){
+    const box=$('iCloud').getBoundingClientRect();
+    const sc=(document.getElementById('stage').getBoundingClientRect().width/1920)||1;
+    const W=box.width/sc,H=box.height/sc;
+    const max=Math.max(...words.map(w=>w.c));
+    const n=words.length;
+    const top=n<=3?190:n<=8?170:n<=20?150:124, low=n<=8?40:30;
+    const placed=[];const meas=$('iMeasure');
+    const out=[];
+    for(const w of words){
+      let fs=Math.round(low+(top-low)*Math.pow(w.c/max,0.75));
+      let pos=null;
+      for(let shrink=0;shrink<6&&!pos;shrink++){
+        meas.style.fontSize=fs+'px';meas.textContent=w.w;
+        const bw=meas.offsetWidth+18,bh=fs*1.05+10;
+        for(let t=0;t<900;t++){
+          const a=t*0.32,r=4.2*a;
+          const x=W/2+r*Math.cos(a)*1.55,y=H/2+r*Math.sin(a);
+          const rc={l:x-bw/2,t:y-bh/2,r:x+bw/2,b:y+bh/2};
+          if(rc.l<0||rc.t<0||rc.r>W||rc.b>H)continue;
+          if(placed.some(p=>!(rc.r<p.l||rc.l>p.r||rc.b<p.t||rc.t>p.b)))continue;
+          pos={x,y};placed.push(rc);break;
+        }
+        if(!pos)fs=Math.round(fs*0.82);
+      }
+      if(pos)out.push({w:w.w,k:w.k,fs,x:pos.x,y:pos.y});
+    }
+    return out;
+  }
+  function render(data){
+    $('iTotal').textContent=data.total||0;
+    const words=(data.words||[]).map(o=>({w:o.w,c:o.c,k:o.w.toLowerCase().replace(/\s+/g,'')})).sort((a,b)=>b.c-a.c||a.w.localeCompare(b.w)).slice(0,45);
+    const sig=JSON.stringify(words);if(sig===lastSig)return;lastSig=sig;
+    $('iEmpty').style.display=words.length?'none':'';
+    const pl=layout(words);const keep=new Set();
+    for(const p of pl){
+      let el=els.get(p.k);
+      if(!el){el=document.createElement('span');el.textContent=p.w;el.style.color=COLORS[hash(p.k)%COLORS.length];
+        el.style.left=p.x+'px';el.style.top=p.y+'px';el.style.fontSize=Math.round(p.fs*0.4)+'px';$('iCloud').appendChild(el);els.set(p.k,el);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{el.classList.add('in');el.style.fontSize=p.fs+'px'}));
+      }else{el.style.left=p.x+'px';el.style.top=p.y+'px';el.style.fontSize=p.fs+'px'}
+      keep.add(p.k);
+    }
+    for(const [k,el] of els)if(!keep.has(k)){el.remove();els.delete(k)}
+  }
+  async function poll(){if(slides[cur]!==sec&&lastSig)return;try{render(await api('/api/words'))}catch(e){}}
+  function start(){if(!served||timer)return;poll();timer=setInterval(poll,1500)}
+  function stop(){clearInterval(timer);timer=null}
+
+  function paint(){$('iQ').textContent=cfg.q}
+  const m=document.createElement('span');m.id='iMeasure';m.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;font-weight:800;letter-spacing:-.03em;line-height:1;left:-9999px;top:0';sec.appendChild(m);
+
+  $('iCfg').onclick=e=>{e.stopPropagation();$('iInQ').value=cfg.q;$('iPanel').classList.toggle('open')};
+  const readI=()=>({q:$('iInQ').value.trim()||base.q});
+  $('iClose').onclick=()=>$('iPanel').classList.remove('open');
+  $('iApply').onclick=()=>{cfg=readI();try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}$('iPanel').classList.remove('open');paint();pushQ()};
+  $('iBake').onclick=()=>{cfg=readI();try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}window.__bakeDownload(null,cfg);$('iPanel').classList.remove('open');paint();pushQ()};
+  let armed=false;
+  $('iReset').onclick=async e=>{e.stopPropagation();
+    if(!armed){armed=true;e.target.textContent='한 번 더 누르면 초기화';setTimeout(()=>{armed=false;e.target.textContent='초기화'},3000);return}
+    armed=false;e.target.textContent='초기화';
+    try{await api('/api/reset',{method:'POST'});lastSig='';for(const el of els.values())el.remove();els.clear();poll()}catch(err){}};
+  addEventListener('keydown',e=>{if(slides[cur].id!=='iceSlide'||e.target.closest('input'))return;
+    if(e.key==='s'||e.key==='S')$('iPanel').classList.toggle('open')});
+  paint();loadWifi();loadInfo().then(pushQ);start();
+  $('iWifi').onclick=e=>{e.stopPropagation();window.WIFI_SETUP&&WIFI_SETUP.open()};
+  return{cfg:()=>cfg,wifi:drawWifi,reinfo:loadInfo};
+})();
+
+function makePoll(sec,pref,apiId,isQuiz){
+  const R=k=>sec.querySelector('[data-r="'+k+'"]');
+  const d=sec.dataset,cap=pref.charAt(0).toUpperCase()+pref.slice(1);
+  const base={q:d[pref+'Q']||'',options:(d[pref+'Opts']||'').split('|').map(t=>t.trim()).filter(Boolean),answer:isQuiz?(+d[pref+'Answer']||1):0};
+  const KEY='kn-'+pref+':'+base.q+'|'+base.options.join('|')+'|'+base.answer;
+  let cfg={...base,options:[...base.options]};
+  try{const sv=JSON.parse(localStorage.getItem(KEY)||'null');if(sv&&sv.options&&sv.options.length)cfg=sv}catch(e){}
+  const served=location.protocol.startsWith('http');
+  const COLORS=['#a592ff','#3ec8ff','#ff8a6b','#7cf2c4','#ffd36b','#f4f4f6'];
+  const ROW=112;let rows=[],lastSig='',revealed=false;
+  const q='?id='+apiId;
+  async function api(path,opt){const r=await fetch(path,Object.assign({cache:'no-store'},opt||{}));if(!r.ok)throw new Error(r.status);return r.json()}
+  if(isQuiz)sec.classList.add('quizmode');
+  function build(){
+    R('q').textContent=cfg.q;R('board').innerHTML='';rows=[];lastSig='';
+    cfg.options.forEach((t,i)=>{
+      const el=document.createElement('div');el.className='prow';
+      el.innerHTML='<div class="prank"></div><div class="pmain"><div class="plabel"><span></span><span class="pbadge">✓ 정답</span></div><div class="ptrack"><div class="pbar"></div></div></div><div class="pnum"><b>0</b><span>0%</span></div>';
+      el.querySelector('.plabel span').textContent=t;el.querySelector('.pbar').style.background=COLORS[i%COLORS.length];
+      el.style.transform='translateY('+(i*ROW)+'px)';R('board').appendChild(el);rows.push(el)});
+    render(cfg.options.map(()=>0),0,false);
+  }
+  function render(counts,total,rev){
+    const sig=JSON.stringify([counts,rev]);if(sig===lastSig)return;lastSig=sig;revealed=rev;
+    R('total').textContent=total;
+    const max=Math.max(1,...counts);
+    const order=counts.map((c,i)=>({c,i})).sort((a,b)=>b.c-a.c||a.i-b.i);
+    const ans=cfg.answer-1;
+    order.forEach((o,rank)=>{const el=rows[o.i];if(!el)return;
+      el.style.transform='translateY('+(rank*ROW)+'px)';
+      el.querySelector('.prank').textContent=(rank+1);
+      el.querySelector('.pbar').style.width=(o.c/max*100)+'%';
+      el.querySelector('.pnum b').textContent=o.c;
+      el.querySelector('.pnum span').textContent=(total?Math.round(o.c/total*100):0)+'%';
+      const lead=rank===0&&o.c>0;
+      el.classList.toggle('lead',lead);
+      el.classList.toggle('correct',isQuiz&&rev&&o.i===ans);
+      el.classList.toggle('wrong',isQuiz&&rev&&o.i!==ans);
+      el.querySelector('.pbar').style.background=(!isQuiz&&lead)?'var(--lime)':COLORS[o.i%COLORS.length];
+    });
+    if(isQuiz){const b=R('reveal');b.textContent=rev?'정답 숨기기':'정답 공개';b.classList.toggle('primary',!rev)}
+  }
+  const payload=()=>JSON.stringify({q:cfg.q,options:cfg.options,answer:isQuiz?cfg.answer-1:-1});
+  async function push(){if(!served)return;try{await api('/api/poll/config'+q,{method:'POST',headers:{'Content-Type':'application/json'},body:payload()})}catch(e){}}
+  async function poll(){if(slides[cur]!==sec&&lastSig&&lastSig!=='x')return;try{const r=await api('/api/poll'+q);if(r.options&&r.options.join('|')===cfg.options.join('|'))render(r.counts||[],r.total||0,!!r.reveal)}catch(e){}}
+  async function info(refresh){
+    if(!served)return;
+    try{const i=await api('/api/info');const url=i.vote||'';
+      if(url){const qq=qrcode(0,'M');qq.addData(url);qq.make();R('qr').innerHTML=qq.createSvgTag({cellSize:8,margin:0,scalable:true})}
+      else R('qr').innerHTML='<div class="ph">휴대폰 접속 주소를<br>찾지 못했습니다</div>';
+      R('url').textContent=url?url.replace(/^https?:\/\//,''):'Wi-Fi 연결을 확인해주세요';
+    }catch(e){R('url').textContent='응답 서버에 연결하지 못했습니다'}
+  }
+  const ins=()=>[...sec.querySelectorAll('.pInO')];
+  function open(){R('inQ').value=cfg.q;ins().forEach((el,i)=>el.value=cfg.options[i]||'');if(isQuiz)R('inA').value=cfg.answer;R('panel').classList.add('open')}
+  function read(){const o=ins().map(el=>el.value.trim()).filter(Boolean);const opts=o.length>=2?o:cfg.options;
+    let a=isQuiz?parseInt(R('inA').value,10):0;if(isQuiz&&!(a>=1&&a<=opts.length))a=Math.min(cfg.answer,opts.length);
+    return{q:R('inQ').value.trim()||base.q,options:opts,answer:a}}
+  function save(c){cfg=c;try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(e){}R('panel').classList.remove('open');build();push().then(poll)}
+  R('cfg').onclick=e=>{e.stopPropagation();R('panel').classList.contains('open')?R('panel').classList.remove('open'):open()};
+  R('close').onclick=()=>R('panel').classList.remove('open');
+  R('apply').onclick=()=>save(read());
+  R('bake').onclick=()=>{save(read());window.__bakeDownload(null,null)};
+  if(isQuiz)R('reveal').onclick=async e=>{e.stopPropagation();try{await api('/api/poll/reveal'+q,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({show:!revealed})});lastSig='';poll()}catch(err){}};
+  let armed=false;
+  R('reset').onclick=async e=>{e.stopPropagation();
+    if(!armed){armed=true;e.target.textContent='한 번 더 누르면 초기화';setTimeout(()=>{armed=false;e.target.textContent='초기화'},3000);return}
+    armed=false;e.target.textContent='초기화';try{await api('/api/poll/reset'+q,{method:'POST'});lastSig='';poll()}catch(err){}};
+  addEventListener('keydown',e=>{if(slides[cur]!==sec||e.target.closest('input'))return;
+    if(e.key==='s'||e.key==='S'){R('panel').classList.contains('open')?R('panel').classList.remove('open'):open()}
+    if(isQuiz&&(e.key==='r'||e.key==='R'))R('reveal').click()});
+  build();info();push().then(()=>{poll();if(served)setInterval(poll,1200)});
+  return{cfg:()=>cfg,reinfo:info,attr:pref};
+}
+window.POLL=makePoll(document.getElementById('pollSlide'),'poll','poll',false);
+window.QUIZ=makePoll(document.getElementById('quizSlide'),'quiz','quiz',true);
+
+/* ===== Venue Wi-Fi check (asked on every launch; nothing is stored) ===== */
+window.WIFI_SEL=null;
+window.WIFI_SETUP=(function(){
+  const $=id=>document.getElementById(id);const m=$('wModal');
+  const served=location.protocol.startsWith('http');
+  function stat(t,c){$('wStat').textContent=t;$('wStat').className='wstat'+(c?' '+c:'')}
+  async function read(){
+    stat('노트북 Wi-Fi를 읽는 중…');
+    let w={};try{const r=await fetch('/api/wifi',{cache:'no-store'});w=await r.json()}catch(e){}
+    const a=(w.auth||'').toLowerCase();
+    $('wSsid').value=w.ssid||'';$('wPass').value=w.pass||'';
+    if(!w.ssid)stat('Wi-Fi 연결을 찾지 못했습니다. 유선 랜이면 Wi-Fi 이름과 비밀번호를 직접 넣거나 "Wi-Fi QR 없이 진행"을 누르세요.','warn');
+    else if(a&&!/psk|sae|open|owe/.test(a))stat('회사 계정으로 로그인하는 Wi-Fi입니다. QR로는 연결할 수 없으니 "Wi-Fi QR 없이 진행"을 권합니다.','warn');
+    else if(!w.pass&&!/open|owe/.test(a))stat('비밀번호를 읽지 못했습니다. 직접 입력해주세요.','warn');
+    else stat('✓ 지금 연결된 Wi-Fi를 읽었습니다. 맞으면 "이 Wi-Fi로 시작"을 누르세요.','ok');
+    try{await fetch('/api/info?refresh=1',{cache:'no-store'})}catch(e){}
+  }
+  function close(){m.hidden=true}
+  function apply(sel){window.WIFI_SEL=sel;window.ICE&&ICE.wifi();window.ICE&&ICE.reinfo();window.POLL&&POLL.reinfo();window.QUIZ&&QUIZ.reinfo();close()}
+  $('wOk').onclick=()=>{const ssid=$('wSsid').value.trim();if(!ssid){stat('Wi-Fi 이름을 넣어주세요.','warn');return}apply({ssid,pass:$('wPass').value})};
+  $('wSkip').onclick=()=>apply(null);
+  $('wRe').onclick=read;
+  $('wShow').onclick=()=>{const p=$('wPass');p.type=p.type==='password'?'text':'password';$('wShow').textContent=p.type==='password'?'보기':'숨기기'};
+  m.addEventListener('click',e=>e.stopPropagation());
+  m.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&e.target.tagName==='INPUT')$('wOk').click()});
+  let cloud=false;
+  async function open(){if(!served||cloud)return;m.hidden=false;read()}
+  (async()=>{if(!served)return;try{const i=await (await fetch('/api/info',{cache:'no-store'})).json();
+    if(i.cloud){cloud=true;const b=document.getElementById('iWifi');if(b)b.style.display='none';apply(null);return}}catch(e){}open()})();
+  return{open,isOpen:()=>!m.hidden};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070a">
+<title>AI × 현업 라이브</title>
+<style>
+:root{--bg:#07070a;--fg:#f4f4f6;--mute:#8b8b96;--dim:#4a4a55;--line:rgba(255,255,255,.12);--lime:#c8ff3e;--violet:#7c5cff;--coral:#ff5a36;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);-webkit-font-smoothing:antialiased;word-break:keep-all;
+  background-image:radial-gradient(60% 40% at 0% 0%,rgba(124,92,255,.35),transparent 70%),radial-gradient(50% 30% at 100% 100%,rgba(200,255,62,.12),transparent 70%)}
+main{min-height:100%;display:flex;flex-direction:column;padding:max(28px,env(safe-area-inset-top)) 20px max(28px,env(safe-area-inset-bottom));max-width:520px;margin:0 auto}
+.view{display:none;flex-direction:column;animation:in .45s cubic-bezier(.2,.7,.2,1)}
+.view.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view{animation:none}}
+.kicker{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 12px var(--lime)}
+h1{font-size:32px;line-height:1.28;letter-spacing:-.03em;font-weight:800;margin:18px 0 8px;text-wrap:balance}
+.sub{color:var(--mute);font-size:15px;line-height:1.5}
+form{margin-top:30px;display:flex;flex-direction:column;gap:14px}
+input{width:100%;font:inherit;font-size:24px;font-weight:600;padding:20px;border-radius:18px;border:1.5px solid var(--line);background:rgba(255,255,255,.05);color:var(--fg);outline:none;-webkit-appearance:none}
+input:focus{border-color:var(--lime)}
+input::placeholder{font-size:18px;font-weight:500;color:var(--dim)}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--dim)}
+.cta{font:inherit;font-size:19px;font-weight:700;padding:19px;border-radius:18px;border:0;background:var(--lime);color:#0a0a0a;cursor:pointer}
+.cta:disabled{opacity:.45}
+.ghost{font:inherit;font-size:17px;font-weight:700;padding:16px;border-radius:18px;background:transparent;color:var(--fg);border:1.5px solid var(--line);cursor:pointer}
+.msg{min-height:44px;margin-top:16px;font-size:16px;line-height:1.5;color:var(--mute)}
+.msg.ok{color:var(--lime);font-weight:700}
+.msg.err{color:var(--coral)}
+.done{display:none;flex-direction:column;align-items:flex-start;gap:14px;margin-top:36px}
+.done .big{font-size:52px;color:var(--lime)}
+.done p{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.done small{color:var(--mute);font-size:15px}
+.opts{margin-top:24px;display:flex;flex-direction:column;gap:12px}
+.opt{display:flex;gap:14px;align-items:center;width:100%;text-align:left;font:inherit;font-size:18px;font-weight:600;line-height:1.4;padding:18px;border-radius:18px;border:1.5px solid var(--line);background:rgba(255,255,255,.04);color:var(--fg);cursor:pointer;transition:border-color .15s,background .15s,transform .1s}
+.opt:active{transform:scale(.98)}
+.opt .n{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:800;background:rgba(255,255,255,.08);color:var(--mute)}
+.opt.on{border-color:var(--lime);background:rgba(200,255,62,.1)}
+.opt.on .n{background:var(--lime);color:#0a0a0a}
+.opt.right{border-color:var(--lime);background:rgba(200,255,62,.16)}
+.opt.right .n{background:var(--lime);color:#0a0a0a}
+.opt.miss{border-color:var(--coral);background:rgba(255,90,54,.1)}
+.opt.dim{opacity:.4}
+.result{display:none;margin-top:22px;padding:22px;border-radius:18px;font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.4}
+.result.on{display:block;animation:in .45s cubic-bezier(.2,.7,.2,1)}
+.result.ok{background:rgba(200,255,62,.14);color:var(--lime)}
+.result.no{background:rgba(255,90,54,.12);color:#ff8a6b}
+.result small{display:block;font-size:15px;font-weight:500;color:var(--mute);margin-top:6px}
+.wait{flex:1;justify-content:center;min-height:60vh}
+.pulse{width:14px;height:14px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 0 rgba(200,255,62,.6);animation:pl 1.8s infinite;margin-bottom:26px}
+@keyframes pl{70%{box-shadow:0 0 0 22px rgba(200,255,62,0)}100%{box-shadow:0 0 0 0 rgba(200,255,62,0)}}
+.wait h1{font-size:28px}
+.live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);margin-top:auto;padding-top:26px}
+.live i{width:7px;height:7px;border-radius:50%;background:var(--dim)}
+.live.on i{background:var(--lime)}
+</style>
+</head>
+<body>
+<main>
+  <!-- waiting: presenter is on another slide -->
+  <section class="view wait on" id="vWait">
+    <div class="pulse"></div>
+    <h1 id="waitT">곧 시작합니다</h1>
+    <p class="sub" id="waitS">이 화면을 켜두세요. 발표 장표가 넘어가면 여기도 자동으로 바뀝니다.</p>
+  </section>
+
+  <!-- icebreaker: one word -->
+  <section class="view" id="vIce">
+    <div class="kicker">Ice breaking</div>
+    <h1 id="iceQ">지금 내 상태는?</h1>
+    <p class="sub">한 단어로 솔직하게. 익명이라 아무도 모릅니다.</p>
+    <form id="iceF" autocomplete="off">
+      <input id="w" maxlength="20" placeholder="예: 졸림, 설렘, 퇴근하고싶다" enterkeyhint="send" aria-label="한 단어 답">
+      <div class="meta"><span id="left"></span><span id="len">0/20</span></div>
+      <button class="cta" id="send" type="submit">보내기</button>
+      <div class="msg" id="iceMsg" role="status"></div>
+    </form>
+    <div class="done" id="iceDone">
+      <div class="big">✓</div>
+      <p>보냈어요! 앞 화면을 보세요</p>
+      <small id="doneLeft"></small>
+      <button class="ghost" id="more" type="button">하나 더 보내기</button>
+    </div>
+  </section>
+
+  <!-- poll: pick one -->
+  <section class="view" id="vPoll">
+    <div class="kicker" id="pollK">Live poll</div>
+    <h1 id="pollQ">불러오는 중…</h1>
+    <p class="sub" id="pollSub">하나만 골라주세요. 바꾸고 싶으면 다른 보기를 다시 누르면 됩니다.</p>
+    <div class="opts" id="opts"></div>
+    <div class="result" id="pollRes" role="status"></div>
+    <div class="msg" id="pollMsg" role="status"></div>
+  </section>
+
+  <div class="live" id="live"><i></i><span id="liveT">발표 화면과 연결 중…</span></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+async function api(path,opt){const r=await fetch(path,Object.assign({cache:'no-store'},opt||{}));if(!r.ok)throw new Error(r.status);return r.json()}
+
+/* ---------- follow the presenter ---------- */
+let stage='',seen=new Set(),fails=0;
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id))}
+function onStage(s){
+  if(s===stage)return;stage=s;
+  if(s==='iceSlide'){show('vIce');seen.add(s);iceInit()}
+  else if(s==='pollSlide'||s==='quizSlide'){pkey=s==='quizSlide'?'quiz':'poll';psig='';show('vPoll');seen.add(s);$('pollK').textContent=pkey==='quiz'?'Quiz':'Live poll';$('pollSub').textContent=pkey==='quiz'?'정답이라고 생각하는 걸 하나 고르세요. 정답 공개 전까지 바꿀 수 있습니다.':'하나만 골라주세요. 바꾸고 싶으면 다른 보기를 다시 누르면 됩니다.';pollLoad()}
+  else{
+    if(seen.size){$('waitT').textContent='고마워요! 이제 앞 화면을 봐주세요';$('waitS').textContent='다음 참여 순서가 오면 여기가 다시 바뀝니다.'}
+    show('vWait');
+  }
+}
+async function follow(){
+  try{const d=await api('/api/stage');fails=0;$('live').classList.add('on');$('liveT').textContent='발표 화면과 연결됨';onStage(d.stage||'')}
+  catch(e){if(++fails>=3){$('live').classList.remove('on');$('liveT').textContent='연결이 끊겼어요. 강의장 Wi-Fi를 확인해주세요'}}
+}
+(function loop(){follow().finally(()=>setTimeout(loop,(stage==='iceSlide'||stage==='pollSlide'||stage==='quizSlide'||!seen.size)?1500:5000))})();
+
+/* ---------- icebreaker ---------- */
+const MAX=3;let sent=+store.get('ice-sent',0)||0,iceReady=false;
+function updLeft(){const l=Math.max(0,MAX-sent);$('left').textContent=l?l+'번 더 보낼 수 있어요':'이미 3번 보내셨어요';$('doneLeft').textContent=l?'아직 '+l+'번 더 보낼 수 있어요':'참여해 주셔서 고마워요';$('more').style.display=l?'':'none';$('send').disabled=!l}
+async function iceInit(){
+  updLeft();
+  try{const i=await api('/api/info');if(i.q)$('iceQ').textContent=i.q}catch(e){}
+  if(!iceReady){iceReady=true;
+    $('w').addEventListener('input',()=>{$('len').textContent=[...$('w').value].length+'/20';$('iceMsg').textContent=''});
+    $('iceF').addEventListener('submit',async e=>{
+      e.preventDefault();
+      const w=$('w').value.trim().replace(/\s+/g,' ');
+      if(!w){$('iceMsg').className='msg err';$('iceMsg').textContent='한 단어를 입력해주세요';return}
+      if(sent>=MAX)return;
+      $('send').disabled=true;$('send').textContent='보내는 중…';
+      try{await api('/api/words',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({w})});
+        sent++;store.set('ice-sent',sent);$('w').value='';$('len').textContent='0/20';
+        $('iceF').style.display='none';$('iceDone').style.display='flex';
+      }catch(err){$('iceMsg').className='msg err';$('iceMsg').textContent='전송하지 못했어요. 잠시 후 다시 눌러주세요.'}
+      $('send').textContent='보내기';updLeft();
+    });
+    $('more').onclick=()=>{$('iceDone').style.display='none';$('iceF').style.display='flex';$('w').focus()};
+  }
+}
+
+/* ---------- poll ---------- */
+let me=store.get('poll-id','');if(!me){me=Math.random().toString(36).slice(2)+Date.now().toString(36);store.set('poll-id',me)}
+let pick=-1,psig='',pkey='poll',rev=false;
+function drawPoll(d){
+  const s=JSON.stringify([pkey,d.q,d.options]);
+  if(s!==psig){psig=s;pick=+store.get('poll-pick:'+s,-1);
+    $('pollQ').textContent=d.q||'하나만 골라주세요';$('opts').innerHTML='';
+    (d.options||[]).forEach((t,i)=>{const b=document.createElement('button');b.className='opt';b.type='button';
+      b.innerHTML='<span class="n">'+(i+1)+'</span><span></span>';b.lastChild.textContent=t;b.onclick=()=>vote(i);$('opts').appendChild(b)});
+  }
+  rev=!!d.reveal;const ans=rev?d.answer:-1;
+  [...$('opts').children].forEach((b,i)=>{b.classList.toggle('on',i===pick&&!rev);b.classList.toggle('right',rev&&i===ans);b.classList.toggle('miss',rev&&i===pick&&i!==ans);b.classList.toggle('dim',rev&&i!==ans&&i!==pick);b.disabled=rev});
+  const res=$('pollRes');
+  if(rev){
+    const n=ans+1;
+    if(pick===ans){res.className='result on ok';res.innerHTML='정답! 🎉<small>역시 현업 감각이 살아 있네요.</small>'}
+    else if(pick>=0){res.className='result on no';res.innerHTML='아쉬워요. 정답은 '+n+'번<small></small>';res.querySelector('small').textContent=(d.options||[])[ans]||''}
+    else{res.className='result on no';res.innerHTML='정답은 '+n+'번<small></small>';res.querySelector('small').textContent=(d.options||[])[ans]||''}
+    $('pollMsg').textContent='';
+  }else{res.className='result';
+    if(pick>=0){$('pollMsg').className='msg ok';$('pollMsg').textContent=pkey==='quiz'?'선택했어요! 정답 공개를 기다려주세요':'선택했어요! 앞 화면에서 순위를 보세요'}else $('pollMsg').textContent=''}
+}
+async function pollLoad(){try{drawPoll(await api('/api/poll?id='+pkey))}catch(e){}}
+async function vote(i){
+  const btns=[...$('opts').children];btns.forEach(b=>b.disabled=true);
+  if(rev)return;
+  try{await api('/api/poll?id='+pkey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:me,i})});
+    pick=i;store.set('poll-pick:'+psig,i);$('pollMsg').className='msg ok';$('pollMsg').textContent=pkey==='quiz'?'선택했어요! 정답 공개를 기다려주세요':'선택했어요! 앞 화면에서 순위를 보세요';
+  }catch(e){$('pollMsg').className='msg err';$('pollMsg').textContent='전송하지 못했어요. 잠시 후 다시 눌러주세요.'}
+  btns.forEach((b,k)=>{b.disabled=rev;b.classList.toggle('on',k===pick)});
+}
+setInterval(()=>{if(stage==='pollSlide'||stage==='quizSlide')pollLoad()},2000);
+</script>
+</body>
+</html>
